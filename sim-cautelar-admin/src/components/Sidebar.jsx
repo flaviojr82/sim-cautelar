@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, Users, Map, AlertTriangle, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import logoImg from '../assets/logo-sim.png'; // <--- IMPORTANTE: Importe a imagem aqui
 
 const Sidebar = () => {
   const location = useLocation();
@@ -13,14 +14,22 @@ const Sidebar = () => {
     { icon: Settings, label: 'Configurações', path: '/config' },
   ];
 
-  return (
+return (
     <aside className="w-64 bg-tjpb-primary text-white h-screen fixed left-0 top-0 flex flex-col shadow-xl">
-      {/* Área da Logo */}
-      <div className="h-20 flex items-center justify-center border-b border-blue-800 bg-blue-900/50">
-        <div className="flex items-center gap-3">
-          {/* Aqui simulamos o SVG caso não tenha o arquivo ainda, ou use <img src={logo} /> */}
-          <div className="w-8 h-8 rounded-full bg-tjpb-secondary flex items-center justify-center text-xs font-bold">SiM</div>
-          <span className="font-bold text-lg tracking-wider">SiM CAUTELAR</span>
+      {/* Área da Logo Atualizada */}
+      <div className="h-24 flex flex-col items-center justify-center border-b border-blue-800 bg-blue-900/30 py-4">
+        
+        {/* Imagem da Logo */}
+        <img 
+            src={logoImg} 
+            alt="Logo SiM Cautelar" 
+            className="h-12 w-auto mb-2 object-contain" 
+        />
+        
+        {/* Texto */}
+        <div className="text-center leading-tight">
+             <span className="block font-bold text-lg tracking-wider">SiM CAUTELAR</span>
+             <span className="block text-[10px] text-blue-300 uppercase tracking-widest">Tribunal de Justiça PB</span>
         </div>
       </div>
 

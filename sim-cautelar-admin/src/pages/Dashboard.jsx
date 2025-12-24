@@ -4,12 +4,36 @@ import { AlertCircle, CheckCircle, Clock, MapPin } from 'lucide-react';
 
 const Dashboard = () => {
   // Dados Mockados (Simulando a API)
-  const stats = [
-    { title: 'Total Assistidos', value: '1,248', icon: MapPin, color: 'bg-blue-500' },
-    { title: 'Apresentações Hoje', value: '86', icon: CheckCircle, color: 'bg-green-500' },
-    { title: 'Alertas Pendentes', value: '12', icon: AlertCircle, color: 'bg-red-500' },
-    { title: 'Aguardando Análise', value: '5', icon: Clock, color: 'bg-yellow-500' },
-  ];
+const stats = [
+  { 
+    title: 'Total Assistidos', 
+    value: '1,248', 
+    icon: MapPin, 
+    bgClass: 'bg-blue-500', 
+    textClass: 'text-blue-500' // Declaramos explicitamente
+  },
+  { 
+    title: 'Apresentações Hoje', 
+    value: '86', 
+    icon: CheckCircle, 
+    bgClass: 'bg-green-500', 
+    textClass: 'text-green-500' 
+  },
+  { 
+    title: 'Alertas Pendentes', 
+    value: '12', 
+    icon: AlertCircle, 
+    bgClass: 'bg-red-500', 
+    textClass: 'text-red-500' 
+  },
+  { 
+    title: 'Aguardando Análise', 
+    value: '5', 
+    icon: Clock, 
+    bgClass: 'bg-yellow-500', 
+    textClass: 'text-yellow-500' 
+  },
+];
 
   const recentAlerts = [
     { id: 1, nome: 'João da Silva', tipo: 'Fora do Perímetro', hora: '10:42', status: 'Crítico' },
@@ -29,8 +53,9 @@ const Dashboard = () => {
                         <p className="text-sm text-gray-500 mb-1">{stat.title}</p>
                         <h3 className="text-3xl font-bold text-gray-800">{stat.value}</h3>
                     </div>
-                    <div className={`p-3 rounded-full ${stat.color} bg-opacity-10`}>
-                        <Icon className={`w-8 h-8 ${stat.color.replace('bg-', 'text-')}`} />
+                    {/* Aqui usamos as propriedades diretas, sem replace */}
+                    <div className={`p-3 rounded-full ${stat.bgClass} bg-opacity-10`}>
+                        <Icon className={`w-8 h-8 ${stat.textClass}`} />
                     </div>
                 </div>
             )
