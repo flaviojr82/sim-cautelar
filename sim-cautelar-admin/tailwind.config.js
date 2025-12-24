@@ -8,15 +8,15 @@ export default {
     extend: {
       colors: {
         brand: {
-          dark: '#1d2939',      // Fundo do Menu (Carvão Profundo)
-          primary: '#2A9D8F',   // O Teal (Verde-Água da Logo)
-          secondary: '#264653', // Azul Petróleo (Complementar)
-          accent: '#E76F51',    // Laranja (Alertas/Destaques)
-          surface: '#f3f4f6',   // Fundo da Tela (Cinza Claro)
+          dark: '#0f172a',      // Fundo do Menu (Slate 900 - Muito profissional)
+          primary: '#2A9D8F',   // Teal (Identidade Principal)
+          secondary: '#264653', // Azul Petróleo
+          accent: '#E76F51',    // Laranja (Alertas)
+          surface: '#f8fafc',   // Fundo da Tela (Slate 50)
         }
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       }
     },
   },
