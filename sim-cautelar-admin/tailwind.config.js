@@ -7,12 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        tjpb: {
-          primary: '#1a3b5c', // Azul Institucional
-          secondary: '#2A9D8F', // Verde Teal (Identidade Visual)
-          accent: '#E76F51', // Laranja (Alertas)
-          light: '#f8f9fa',
+        brand: {
+          dark: '#1d2939',      // Fundo do Menu (Carvão Profundo)
+          primary: '#2A9D8F',   // O Teal (Verde-Água da Logo)
+          secondary: '#264653', // Azul Petróleo (Complementar)
+          accent: '#E76F51',    // Laranja (Alertas/Destaques)
+          surface: '#f3f4f6',   // Fundo da Tela (Cinza Claro)
         }
+      },
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       }
     },
   },
