@@ -3,53 +3,51 @@ import Sidebar from './Sidebar';
 
 const Layout = ({ children }) => {
   return (
-    <div className="flex min-h-screen bg-[#F5F5F5] font-arial overflow-x-hidden">
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
-
-      {/* Main Content Area */}
-      <main className="flex-1 ml-[280px]">
-        
-        {/* HEADER (Exato conforme Spec) */}
-        <header className="h-[110px] bg-white shadow-header relative z-40">
-            {/* Logo e Título TJPB */}
-            <div className="absolute left-[20px] top-[35px] flex items-center gap-[12px]">
-                {/* Placeholder para logo do TJPB (quadrada) */}
-                <div className="w-[40px] h-[52px] bg-gray-200" /> 
-                <h1 className="font-segoe text-[36px] text-[#1E1E1E] leading-[27px]">
-                    Tribunal de Justiça da Paraíba
-                </h1>
+      
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* HEADER */}
+        <header className="header-container">
+            {/* Lado Esquerdo: Logo TJPB + Título */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '40px', height: '52px', background: '#E2E2E2' }}>
+                  {/* Placeholder da Logo TJPB */}
+                </div>
+                <h1 className="header-title">Tribunal de Justiça da Paraíba</h1>
             </div>
 
-            {/* Ícones do Lado Direito */}
-            <div className="absolute right-[40px] top-[31px] flex items-center gap-[30px]">
-                {/* Notificações */}
-                <button className="relative w-[36px] h-[36px] flex items-center justify-center">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A5565" strokeWidth="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    {/* Bolinha vermelha */}
-                    <span className="absolute top-[4px] right-[6px] w-[8px] h-[8px] bg-[#FB2C36] rounded-full" />
-                </button>
+            {/* Lado Direito: Notificação + Perfil */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+                {/* Botão Notificação */}
+                <div style={{ position: 'relative', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4A5565" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                   </svg>
+                   <div style={{ position: 'absolute', top: '2px', right: '4px', width: '8px', height: '8px', background: '#FB2C36', borderRadius: '50%', border: '1px solid white' }}></div>
+                </div>
 
-                {/* Perfil do Usuário */}
-                <div className="flex items-center gap-[12px] bg-white border border-transparent rounded-[10px] px-2 py-1">
-                     <div className="text-right">
-                        <p className="text-[14px] font-bold text-[#1E1E1E]">Dr. Juiz</p>
-                        <p className="text-[12px] text-gray-500">Magistrado</p>
-                     </div>
-                     <div className="w-[40px] h-[40px] rounded-full bg-gray-300 overflow-hidden ring-2 ring-[#E5E7EB]">
-                        <img src="https://ui-avatars.com/api/?name=Juiz+TJPB&background=random" alt="User" />
-                     </div>
+                {/* Perfil */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '14px' }}>Dr. Juiz</div>
+                        <div style={{ fontSize: '12px', color: '#6A7282' }}>Magistrado</div>
+                    </div>
+                    <img 
+                        src="https://ui-avatars.com/api/?name=Dr+Juiz&background=random" 
+                        alt="User"
+                        style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #E5E7EB' }} 
+                    />
                 </div>
             </div>
         </header>
 
-        {/* Conteúdo da Página */}
-        <div className="p-[32px]">
+        {/* CONTEÚDO */}
+        <main className="main-content">
             {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

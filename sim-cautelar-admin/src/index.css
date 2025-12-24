@@ -1,35 +1,201 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Removemos as configurações padrões do Vite que centralizam o conteúdo */
-/* e definimos o fundo padrão do sistema */
-
-body {
-  background-color: #f3f4f6; /* Cor cinza claro suave (Gray-100) */
+/* RESET BÁSICO */
+* {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100vh;
-  /* Garante que o texto tenha boa legibilidade */
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #F5F5F5; /* Cor de fundo exata do spec */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #1E2939;
 }
 
-/* Opcional: Estilização da barra de rolagem para combinar com o sistema */
-::-webkit-scrollbar {
+/* VARIÁVEIS DE CORES (Extraídas do seu CSS) */
+:root {
+  --sidebar-grad-start: #3F6F74;
+  --sidebar-grad-end: #0F99A8;
+  --card-grad-start: #42969F;
+  --card-grad-end: #00B0C4;
+  --header-text: #1E1E1E;
+  --text-primary: #1E2939;
+  --text-secondary: #6A7282;
+  --border-beige: rgba(255, 225, 201, 0.5);
+  --shadow-header: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0px 10px 15px -5px rgba(36, 77, 119, 0.2), 0px 8px 10px -6px rgba(36, 77, 119, 0.2);
+}
+
+/* ESTILOS DE COMPONENTES ESPECÍFICOS */
+
+/* Sidebar Container */
+.sidebar-container {
+  width: 280px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: linear-gradient(180deg, var(--sidebar-grad-start) 0%, var(--sidebar-grad-end) 100%);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+
+/* Logo Box (Caixa Branca) */
+.logo-box {
+  width: 280px;
+  height: 222px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #FFE1C9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Menu Item */
+.menu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 248px;
+  height: 44px;
+  margin: 0 auto 15px auto;
+  padding-left: 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #FFFFFF;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.menu-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-link.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Header Styles */
+.header-container {
+  height: 110px;
+  width: calc(100% - 280px);
+  margin-left: 280px;
+  background-color: #FFFFFF;
+  box-shadow: var(--shadow-header);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+
+.header-title {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 36px;
+  color: var(--header-text);
+  font-weight: 400;
+}
+
+/* Dashboard Styles */
+.main-content {
+  margin-left: 280px;
+  padding: 32px;
+}
+
+.page-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.title-pill {
   width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1; 
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1; 
+  height: 40px;
+  background: linear-gradient(180deg, #0A9FAF 0%, #2A585D 100%);
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8; 
+.page-h1 {
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+/* Cards de KPI */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 32px;
+}
+
+/* Responsividade básica para cards */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.kpi-card {
+  height: 150px;
+  background: linear-gradient(110.45deg, var(--card-grad-start) -0.37%, var(--card-grad-end) 100%);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2;
+}
+
+.icon-box {
+  width: 39px;
+  height: 39px;
+  background: rgba(255, 225, 201, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-pill {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.kpi-value {
+  font-size: 30px;
+  font-weight: 400;
+  z-index: 2;
+}
+
+/* Gráfico Container */
+.chart-container {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid #F3F4F6;
+  box-shadow: var(--shadow-card);
 }
