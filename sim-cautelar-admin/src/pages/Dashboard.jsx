@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import Layout from '../components/Layout';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { Users, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 
 const Dashboard = () => {
-  // Dados Mockados
+  const navigate = useNavigate(); // Hook de navegação
+
   const data = [
     { name: 'Seg', total: 45 }, { name: 'Ter', total: 52 },
     { name: 'Qua', total: 38 },
@@ -12,24 +14,52 @@ const Dashboard = () => {
     { name: 'Sáb', total: 20 }, { name: 'Dom', total: 15 },
   ];
 
+  // Função de navegação centralizada
+  const handleCardClick = (tipo) => {
+    switch(tipo) {
+      case 'total':
+        navigate('/assistidos'); // Mostra todos
+        break;
+      case 'hoje':
+        navigate('/apresentacoes'); // Nova tela
+        break;
+      case 'irregulares':
+        navigate('/assistidos?filtro=alert'); // Filtra por status 'alert'
+        break;
+      case 'analise':
+        navigate('/assistidos?filtro=analysis'); // Filtra por status 'analysis'
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Layout>
-      {/* Título da Página */}
       <div className="page-title-group">
          <div className="title-pill"></div>
          <h2 className="page-h1">Início</h2>
       </div>
 
-      {/* Grid de KPIs */}
       <div className="kpi-grid">
-         <KPICard title="Total Monitorados" value="1.248" icon={Users} />
-         <KPICard title="Apresentações Hoje" value="142" icon={CheckCircle} />
-         <KPICard title="Irregulares" value="12" icon={AlertTriangle} />
-         <KPICard title="Análises Pendentes" value="08" icon={Clock} />
+         {/* Adicionado onClick em cada card */}
+         <div onClick={() => handleCardClick('total')}>
+            <KPICard title="Total Monitorados" value="1.248" icon={Users} />
+         </div>
+         <div onClick={() => handleCardClick('hoje')}>
+            <KPICard title="Apresentações Hoje" value="142" icon={CheckCircle} />
+         </div>
+         <div onClick={() => handleCardClick('irregulares')}>
+            <KPICard title="Irregulares" value="12" icon={AlertTriangle} />
+         </div>
+         <div onClick={() => handleCardClick('analise')}>
+            <KPICard title="Análises Pendentes" value="08" icon={Clock} />
+         </div>
       </div>
 
-      {/* Container do Gráfico */}
+      {/* ... (Gráfico permanece igual) ... */}
       <div className="chart-container">
+        {/* ... código do gráfico ... */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
             <h3 style={{ fontSize: '24px', fontWeight: '400', color: '#1E2939' }}>Dashboard</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -60,7 +90,6 @@ const Dashboard = () => {
   );
 };
 
-// Componente Interno do Card
 const KPICard = ({ title, value, icon: Icon }) => {
     return (
         <div className="kpi-card">
@@ -68,16 +97,9 @@ const KPICard = ({ title, value, icon: Icon }) => {
                 <div className="icon-box">
                     <Icon size={18} color="white" />
                 </div>
-                <div className="label-pill">
-                    {title}
-                </div>
+                <div className="label-pill">{title}</div>
             </div>
-            
-            <div className="kpi-value">
-                {value}
-            </div>
-
-            {/* Ícone Decorativo de Fundo (Opacity 0.1) */}
+            <div className="kpi-value">{value}</div>
             <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', opacity: 0.1, pointerEvents: 'none' }}>
                 <Icon size={140} color="white" />
             </div>
