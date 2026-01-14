@@ -1,19 +1,60 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
-import { Search, MapPin, CheckCircle, FileText, Download } from 'lucide-react';
+import { Search, MapPin, CheckCircle, FileText, Download, UserCheck } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable'; // Importação direta da função
+import autoTable from 'jspdf-autotable';
 
 const Apresentacoes = () => {
   const [busca, setBusca] = useState('');
 
-  // 1. DADOS MOCKADOS
+  // 1. DADOS MOCKADOS (Incluindo "Apresentação Presencial")
   const checkinsHoje = [
-    { id: 1, nome: 'João Pedro Santos', cpf: '098.112.334-12', hora: '08:15', local: 'Fórum Criminal - João Pessoa', metodo: 'Biometria Facial', foto: 'https://ui-avatars.com/api/?name=Joao+Santos&background=fed7aa&color=9a3412' },
-    { id: 2, nome: 'Carlos Eduardo Silva', cpf: '123.456.789-45', hora: '09:30', local: 'Aplicativo SiM Cautelar (GPS)', metodo: 'Reconhecimento Facial', foto: 'https://ui-avatars.com/api/?name=Carlos+Silva&background=c7d2fe&color=3730a3' },
-    { id: 3, nome: 'Roberto Alves', cpf: '456.789.012-78', hora: '10:45', local: 'Fórum de Mangabeira', metodo: 'Biometria Facial', foto: 'https://ui-avatars.com/api/?name=Roberto+Alves&background=bbf7d0&color=166534' },
-    { id: 4, nome: 'Fernanda Oliveira', cpf: '789.012.345-90', hora: '11:10', local: 'Aplicativo SiM Cautelar (GPS)', metodo: 'Reconhecimento Facial', foto: 'https://ui-avatars.com/api/?name=Fernanda+Oliveira&background=e5e7eb&color=374151' },
-    { id: 5, nome: 'Mariana Costa', cpf: '321.654.987-00', hora: '13:20', local: 'Fórum de Cabedelo', metodo: 'Biometria Facial', foto: 'https://ui-avatars.com/api/?name=Mariana+Costa&background=fecaca&color=991b1b' },
+    { 
+      id: 1, 
+      nome: 'João Pedro Santos', 
+      cpf: '098.112.334-12', 
+      hora: '08:15', 
+      local: 'Fórum Criminal - João Pessoa', 
+      metodo: 'Biometria Facial', 
+      foto: 'https://ui-avatars.com/api/?name=Joao+Santos&background=fed7aa&color=9a3412' 
+    },
+    { 
+      id: 2, 
+      nome: 'Carlos Eduardo Silva', 
+      cpf: '123.456.789-45', 
+      hora: '09:30', 
+      local: 'Aplicativo SiM Cautelar (GPS)', 
+      metodo: 'Reconhecimento Facial', 
+      foto: 'https://ui-avatars.com/api/?name=Carlos+Silva&background=c7d2fe&color=3730a3' 
+    },
+    // --- NOVO CENÁRIO: PRESENCIAL ---
+    { 
+      id: 3, 
+      nome: 'Julia Mendes', 
+      cpf: '222.333.444-55', 
+      hora: '10:00', 
+      local: '1ª Vara Mista de Cabedelo', 
+      metodo: 'Apresentação Presencial', 
+      foto: 'https://ui-avatars.com/api/?name=Julia+Mendes&background=bbf7d0&color=166534' 
+    },
+    { 
+      id: 4, 
+      nome: 'Fernanda Oliveira', 
+      cpf: '789.012.345-90', 
+      hora: '11:10', 
+      local: 'Aplicativo SiM Cautelar (GPS)', 
+      metodo: 'Reconhecimento Facial', 
+      foto: 'https://ui-avatars.com/api/?name=Fernanda+Oliveira&background=e5e7eb&color=374151' 
+    },
+    { 
+      id: 5, 
+      nome: 'Roberto Alves', 
+      cpf: '456.789.012-78', 
+      hora: '10:45', 
+      local: 'Fórum de Mangabeira', 
+      metodo: 'Biometria Facial', 
+      foto: 'https://ui-avatars.com/api/?name=Roberto+Alves&background=bbf7d0&color=166534' 
+    },
   ];
 
   // 2. Lógica de Busca
@@ -25,12 +66,12 @@ const Apresentacoes = () => {
     );
   });
 
-  // 3. Função de Exportar PDF (Modo Robusto)
+  // 3. Exportar PDF
   const exportarRelatorio = () => {
     try {
       const doc = new jsPDF();
 
-      // -- CABEÇALHO --
+      // Cabeçalho
       doc.setFillColor(63, 111, 116); 
       doc.rect(0, 0, 210, 40, 'F');
 
@@ -43,7 +84,7 @@ const Apresentacoes = () => {
       doc.setFont('helvetica', 'normal');
       doc.text('SiM Cautelar - Monitoramento Eletrônico', 14, 26);
 
-      // -- INFORMAÇÕES --
+      // Info
       doc.setTextColor(30, 41, 57);
       doc.setFontSize(14);
       doc.text('Relatório Diário de Apresentações', 14, 50);
@@ -54,7 +95,7 @@ const Apresentacoes = () => {
       doc.text(`Gerado em: ${dataHoje}`, 14, 56);
       doc.text(`Total de Registros: ${dadosFiltrados.length}`, 14, 61);
 
-      // -- TABELA (Usando a função importada diretamente) --
+      // Tabela
       const corpoTabela = dadosFiltrados.map(item => [
           item.nome,
           item.cpf,
@@ -79,7 +120,7 @@ const Apresentacoes = () => {
           styles: { font: 'helvetica', fontSize: 9, cellPadding: 4 }
       });
 
-      // -- RODAPÉ --
+      // Rodapé
       const pageCount = doc.internal.getNumberOfPages();
       for(let i = 1; i <= pageCount; i++) {
           doc.setPage(i);
@@ -93,7 +134,7 @@ const Apresentacoes = () => {
 
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
-      alert("Houve um erro ao gerar o relatório. Verifique o console (F12) para detalhes.");
+      alert("Houve um erro ao gerar o relatório.");
     }
   };
 
@@ -139,46 +180,55 @@ const Apresentacoes = () => {
             </thead>
             <tbody>
                 {dadosFiltrados.length > 0 ? (
-                    dadosFiltrados.map((item) => (
-                        <tr key={item.id}>
-                            <td>
-                                <div className="user-cell">
-                                    <img src={item.foto} alt={item.nome} className="user-avatar" />
-                                    <div className="user-info">
-                                        <span className="user-name">{item.nome}</span>
-                                        <span className="user-meta">{item.cpf}</span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style={{ fontWeight: 'bold', color: '#1E2939' }}>{item.hora}</td>
-                            <td style={{ color: '#6A7282' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <MapPin size={14} />
-                                    {item.local}
-                                </div>
-                            </td>
-                            <td>
-                                <span style={{ 
-                                    display: 'inline-block', 
-                                    padding: '4px 8px', 
-                                    borderRadius: '6px', 
-                                    background: '#F0F9FF', 
-                                    color: '#0369A1', 
-                                    fontSize: '12px',
-                                    fontWeight: '500',
-                                    border: '1px solid #BAE6FD'
-                                }}>
-                                    {item.metodo}
-                                </span>
-                            </td>
-                            <td>
-                                <span className="status-badge status-active">
-                                    <CheckCircle size={12} style={{ marginRight: '4px' }} />
-                                    Confirmado
-                                </span>
-                            </td>
-                        </tr>
-                    ))
+                    dadosFiltrados.map((item) => {
+                        // Verifica se é presencial para mudar a cor do badge
+                        const isPresencial = item.metodo === 'Apresentação Presencial';
+
+                        return (
+                          <tr key={item.id}>
+                              <td>
+                                  <div className="user-cell">
+                                      <img src={item.foto} alt={item.nome} className="user-avatar" />
+                                      <div className="user-info">
+                                          <span className="user-name">{item.nome}</span>
+                                          <span className="user-meta">{item.cpf}</span>
+                                      </div>
+                                  </div>
+                              </td>
+                              <td style={{ fontWeight: 'bold', color: '#1E2939' }}>{item.hora}</td>
+                              <td style={{ color: '#6A7282' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                      <MapPin size={14} />
+                                      {item.local}
+                                  </div>
+                              </td>
+                              <td>
+                                  <span style={{ 
+                                      display: 'inline-flex', 
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      padding: '4px 8px', 
+                                      borderRadius: '6px', 
+                                      // Se presencial, usa Roxo. Se não, usa Azul.
+                                      background: isPresencial ? '#F5F3FF' : '#F0F9FF', 
+                                      color: isPresencial ? '#7C3AED' : '#0369A1', 
+                                      fontSize: '12px',
+                                      fontWeight: '600',
+                                      border: isPresencial ? '1px solid #DDD6FE' : '1px solid #BAE6FD'
+                                  }}>
+                                      {isPresencial && <UserCheck size={12} />}
+                                      {item.metodo}
+                                  </span>
+                              </td>
+                              <td>
+                                  <span className="status-badge status-active">
+                                      <CheckCircle size={12} style={{ marginRight: '4px' }} />
+                                      Confirmado
+                                  </span>
+                              </td>
+                          </tr>
+                        );
+                    })
                 ) : (
                     <tr>
                         <td colSpan="5" style={{ padding: '40px 0', textAlign: 'center', color: '#6A7282' }}>

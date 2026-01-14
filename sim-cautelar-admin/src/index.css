@@ -1,6 +1,7 @@
 /* =========================================
    1. RESET E VARIÁVEIS GLOBAIS
    ========================================= */
+
 * {
   margin: 0;
   padding: 0;
@@ -523,4 +524,14 @@ body {
 .btn-secondary:hover {
   background-color: #F1F5F9;
   color: var(--text-primary);
+}
+
+/* ... (outros status anteriores) ... */
+.status-analysis { background-color: #FEF3C7; color: #92400E; }
+
+/* NOVO STATUS: SUSPENSO (Cinza Neutro) */
+.status-suspended { 
+  background-color: #F1F5F9; 
+  color: #64748B; 
+  border: 1px solid #E2E8F0;
 }

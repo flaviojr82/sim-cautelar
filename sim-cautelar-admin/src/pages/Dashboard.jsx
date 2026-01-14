@@ -1,12 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { Users, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
 
 const Dashboard = () => {
-  const navigate = useNavigate(); // Hook de navegação
+  const navigate = useNavigate();
 
+  // Dados para o gráfico (Exemplo estático)
   const data = [
     { name: 'Seg', total: 45 }, { name: 'Ter', total: 52 },
     { name: 'Qua', total: 38 },
@@ -14,20 +15,19 @@ const Dashboard = () => {
     { name: 'Sáb', total: 20 }, { name: 'Dom', total: 15 },
   ];
 
-  // Função de navegação centralizada
   const handleCardClick = (tipo) => {
     switch(tipo) {
       case 'total':
-        navigate('/assistidos'); // Mostra todos
+        navigate('/assistidos?filtro=monitored'); 
         break;
       case 'hoje':
-        navigate('/apresentacoes'); // Nova tela
+        navigate('/apresentacoes');
         break;
       case 'irregulares':
-        navigate('/assistidos?filtro=alert'); // Filtra por status 'alert'
+        navigate('/assistidos?filtro=alert');
         break;
       case 'analise':
-        navigate('/assistidos?filtro=analysis'); // Filtra por status 'analysis'
+        navigate('/assistidos?filtro=analysis');
         break;
       default:
         break;
@@ -42,26 +42,30 @@ const Dashboard = () => {
       </div>
 
       <div className="kpi-grid">
-         {/* Adicionado onClick em cada card */}
+         {/* 1. Total Monitorados: 7 (8 cadastros - 1 suspenso) */}
          <div onClick={() => handleCardClick('total')}>
-            <KPICard title="Total Monitorados" value="1.248" icon={Users} />
+            <KPICard title="Total Monitorados" value="07" icon={Users} />
          </div>
+
+         {/* 2. Apresentações Hoje: 5 (Baseado na lista da tela de Apresentações) */}
          <div onClick={() => handleCardClick('hoje')}>
-            <KPICard title="Apresentações Hoje" value="142" icon={CheckCircle} />
+            <KPICard title="Apresentações Hoje" value="05" icon={CheckCircle} />
          </div>
+
+         {/* 3. Irregulares: 1 (Ana Maria - Status Alert) */}
          <div onClick={() => handleCardClick('irregulares')}>
-            <KPICard title="Irregulares" value="12" icon={AlertTriangle} />
+            <KPICard title="Irregulares" value="01" icon={AlertTriangle} />
          </div>
+
+         {/* 4. Análises: 3 (Mariana, Marcos e Ricardo - Status Analysis) */}
          <div onClick={() => handleCardClick('analise')}>
-            <KPICard title="Análises Pendentes" value="08" icon={Clock} />
+            <KPICard title="Análises Pendentes" value="03" icon={Clock} />
          </div>
       </div>
 
-      {/* ... (Gráfico permanece igual) ... */}
       <div className="chart-container">
-        {/* ... código do gráfico ... */}
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
-            <h3 style={{ fontSize: '24px', fontWeight: '400', color: '#1E2939' }}>Dashboard</h3>
+            <h3 style={{ fontSize: '24px', fontWeight: '400', color: '#1E2939' }}>Fluxo de Apresentações (Semanal)</h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <div style={{ width: '16px', height: '16px', border: '1px solid #6A7282', borderRadius: '2px' }}></div>
                 <span style={{ fontSize: '14px', color: '#6A7282' }}>Atualizado em tempo real</span>
