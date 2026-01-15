@@ -659,3 +659,92 @@ body {
   margin-bottom: 4px;
   font-family: monospace;
 }
+
+/* --- REGRAS DE IMPRESSÃO (PDF) --- */
+@media print {
+  @page { 
+    margin: 10mm; 
+    size: A4; 
+  }
+  
+  body { 
+    background-color: white !important; 
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact;
+  }
+  
+  /* ESCONDER INTERFACE DO SISTEMA */
+  .sidebar, 
+  .top-bar, 
+  .no-print, 
+  .form-container.no-print, 
+  .action-bar, 
+  .page-title-group, 
+  .mobile-menu-btn,
+  .logout-btn {
+    display: none !important;
+  }
+
+  /* RESETAR LAYOUT PARA PÁGINA NORMAL */
+  .layout-wrapper, 
+  .main-content, 
+  .content-scroll, 
+  .content-padding {
+    display: block !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    transform: none !important;
+  }
+  
+  /* FORÇAR EXIBIÇÃO DO RELATÓRIO */
+  .print-area {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .print-header, .print-footer { 
+    display: block !important; 
+  }
+  
+  /* ESTILIZAR TABELA PARA PAPEL */
+  .table-container { 
+    box-shadow: none !important; 
+    border: 1px solid #000 !important; 
+    overflow: visible !important;
+  }
+  
+  .custom-table th { 
+    background-color: #f3f3f3 !important; 
+    color: black !important; 
+    border: 1px solid #000 !important; 
+  }
+  
+  .custom-table td { 
+    border: 1px solid #000 !important; 
+    color: black !important; 
+  }
+  
+  /* KPIS LADO A LADO */
+  .kpi-grid { 
+    display: grid !important; 
+    grid-template-columns: 1fr 1fr 1fr !important; 
+    gap: 16px !important; 
+    margin-bottom: 20px !important;
+  }
+  
+  .kpi-card { 
+    border: 1px solid #ccc !important; 
+    box-shadow: none !important; 
+    background: white !important; 
+    page-break-inside: avoid;
+  }
+  
+  .kpi-card * { 
+    color: black !important; 
+  }
+}
