@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Assistidos from './pages/Assistidos';
 import Apresentacoes from './pages/Apresentacoes';
 import NovoAssistido from './pages/NovoAssistido'; 
+import DetalhesAssistido from './pages/DetalhesAssistido'; // Importar
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/assistidos/editar/:id" element={<NovoAssistido />} />
         
         <Route path="/apresentacoes" element={<Apresentacoes />} />
+
+        <Route path="/assistidos/detalhes/:id" element={<DetalhesAssistido />} />
       </Routes>
     </BrowserRouter>
   );

@@ -66,14 +66,20 @@ const Dashboard = () => {
       <div className="chart-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
             <h3 style={{ fontSize: '24px', fontWeight: '400', color: '#1E2939' }}>Fluxo de Apresentações (Semanal)</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '16px', height: '16px', border: '1px solid #6A7282', borderRadius: '2px' }}></div>
-                <span style={{ fontSize: '14px', color: '#6A7282' }}>Atualizado em tempo real</span>
+            
+            {/* CORREÇÃO AQUI: Substituído o quadrado pelo Ponto Pulsante */}
+            <div className="live-indicator">
+                <div className="status-dot"></div>
+                <span style={{ fontSize: '13px', color: '#10B981', fontWeight: '600' }}>
+                  Atualizado em tempo real
+                </span>
             </div>
+            
         </div>
 
         <div style={{ width: '100%', height: '300px' }}>
-            <ResponsiveContainer width="100%" height="100%">
+             {/* ... (O resto do gráfico permanece igual) */}
+             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data}>
                     <defs>
                         <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">

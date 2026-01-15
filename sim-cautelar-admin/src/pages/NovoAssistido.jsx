@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Layout from '../components/Layout';
-import { useNavigate, useParams } from 'react-router-dom'; // useParams adicionado
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Search, MapPin, Save, Camera, FileText, 
   CornerDownRight, ArrowLeft, Edit3 
@@ -31,8 +31,8 @@ const RecenterMap = ({ coords }) => {
 
 const NovoAssistido = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Pega o ID da URL se existir
-  const isEditMode = !!id; // Verdadeiro se estiver editando
+  const { id } = useParams();
+  const isEditMode = !!id; 
 
   // -- ESTADOS --
   const [numProcessoBusca, setNumProcessoBusca] = useState('');
@@ -47,7 +47,6 @@ const NovoAssistido = () => {
   const [originalData, setOriginalData] = useState({});
   const [justificativas, setJustificativas] = useState({});
   
-  // Configuração Monitoramento
   const [pontoMonitoramento, setPontoMonitoramento] = useState('residencia');
   const [raioPerimetro, setRaioPerimetro] = useState(500);
   const [coords, setCoords] = useState([-7.1195, -34.8450]);
@@ -57,11 +56,9 @@ const NovoAssistido = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const [cameraAtiva, setCameraAtiva] = useState(false);
 
-  // -- EFEITO: CARREGAR DADOS SE FOR EDIÇÃO --
+  // -- CARREGAR DADOS MOCKADOS (EDIÇÃO) --
   useEffect(() => {
     if (isEditMode) {
-        // SIMULAÇÃO: Buscar dados do backend pelo ID
-        // Aqui mapeamos alguns IDs da lista anterior para exibir dados reais
         let dadosSimulados = {};
 
         if (id === '1') { // Carlos Eduardo
@@ -70,7 +67,10 @@ const NovoAssistido = () => {
                 cep: '58000-100', logradouro: 'Rua das Acácias', numero: '400', bairro: 'Torre', cidade: 'João Pessoa - PB',
                 artigo: 'Art. 157', vara: '2ª Vara Criminal', comarca: 'João Pessoa', processo: '0004321-88.2024.8.15.2001'
             };
-            setImgSrc('https://ui-avatars.com/api/?name=Carlos+Silva&background=c7d2fe&color=3730a3'); // Foto existente
+            // Na edição, carregamos a foto existente apenas visualmente se desejar, 
+            // ou deixamos null para indicar que nenhuma "nova" foto foi tirada ainda.
+            // Para simular a foto existente na UI, poderíamos setar, mas para a lógica de salvar,
+            // o importante é que imgSrc null seja aceito.
             setCoords([-7.1350, -34.8750]);
         } else if (id === '99') { // José (Rascunho)
              dadosSimulados = {
@@ -79,9 +79,7 @@ const NovoAssistido = () => {
                 artigo: 'Art. 157', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: '0012345-88.2025.8.15.2001'
             };
             setCoords([-7.1215, -34.8650]);
-            // Sem foto (pois é rascunho)
         } else {
-            // Genérico para outros IDs
             dadosSimulados = {
                 nome: 'Assistido Genérico', cpf: '000.000.000-00', nascimento: '2000-01-01', mae: 'Mãe Genérica',
                 cep: '58000-000', logradouro: 'Rua Exemplo', numero: '123', bairro: 'Centro', cidade: 'João Pessoa - PB',
@@ -90,14 +88,12 @@ const NovoAssistido = () => {
         }
 
         setFormData(dadosSimulados);
-        setOriginalData(dadosSimulados); // Salva o estado inicial da edição
+        setOriginalData(dadosSimulados);
         setNumProcessoBusca(dadosSimulados.processo);
         setDadosCarregados(true);
     }
   }, [id, isEditMode]);
 
-
-  // -- FUNÇÕES --
   const buscarPJe = () => {
     if (!numProcessoBusca) return alert("Digite um número de processo.");
     const dadosPJe = {
@@ -113,7 +109,7 @@ const NovoAssistido = () => {
         artigo: 'Art. 157 - Roubo Majorado',
         vara: '1ª Vara Criminal',
         comarca: 'João Pessoa',
-        processo: numProcessoBusca // Usa o digitado
+        processo: numProcessoBusca
     };
     setFormData(dadosPJe);
     setOriginalData(dadosPJe);
@@ -136,11 +132,20 @@ const NovoAssistido = () => {
     setCameraAtiva(false);
   }, [webcamRef]);
 
+  // --- FUNÇÃO DE SALVAR CORRIGIDA ---
   const salvar = (tipo) => {
-      if (!imgSrc && tipo === 'final') return alert("É obrigatório ter uma foto (capturada ou carregada) para finalizar.");
+      // Regra:
+      // 1. Novo Cadastro (final): Foto OBRIGATÓRIA.
+      // 2. Edição: Foto OPCIONAL (se não tirar nova, mantém a antiga).
+      // 3. Rascunho: Foto OPCIONAL.
+
+      // Se NÃO for edição E NÃO for rascunho E não tiver foto -> Bloqueia
+      if (!isEditMode && tipo === 'final' && !imgSrc) {
+          return alert("É obrigatório capturar a foto para finalizar o cadastro inicial.");
+      }
       
       const msg = isEditMode 
-        ? "Alterações salvas com sucesso! Justificativas registradas." 
+        ? "Alterações salvas com sucesso! (Dados atualizados)" 
         : (tipo === 'draft' ? "Rascunho salvo com sucesso!" : "Cadastro finalizado e pronto para monitoramento!");
       
       alert(msg);
@@ -151,13 +156,11 @@ const NovoAssistido = () => {
     <Layout>
       <div className="page-title-group">
          <div className="title-pill"></div>
-         {/* Título Dinâmico */}
          <h2 className="page-h1">{isEditMode ? 'Editar Cadastro' : 'Cadastrar Assistido'}</h2>
       </div>
 
       <div className="form-container">
         
-        {/* BUSCA PROCESSUAL (Só exibe se NÃO for edição) */}
         {!isEditMode && (
             <div style={{ background: '#F0F9FF', padding: '24px', borderRadius: '12px', marginBottom: '32px', border: '1px solid #BAE6FD' }}>
                 <div className="form-section-title" style={{ marginBottom: '16px', color: '#0369A1', border: 'none' }}>
@@ -167,37 +170,18 @@ const NovoAssistido = () => {
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end' }}>
                     <div className="input-group" style={{ flex: 1 }}>
                         <label>Número do Processo (CNJ)</label>
-                        <input 
-                            type="text" 
-                            className="form-control" 
-                            placeholder="0000000-00.0000.8.15.0000"
-                            value={numProcessoBusca}
-                            onChange={(e) => setNumProcessoBusca(e.target.value)}
-                            disabled={dadosCarregados} 
-                        />
+                        <input type="text" className="form-control" placeholder="0000000-00.0000.8.15.0000" value={numProcessoBusca} onChange={(e) => setNumProcessoBusca(e.target.value)} disabled={dadosCarregados} />
                     </div>
-                    <button 
-                        className="btn-primary" 
-                        onClick={buscarPJe} 
-                        disabled={dadosCarregados}
-                        style={{ height: '48px', opacity: dadosCarregados ? 0.6 : 1 }}
-                    >
-                        <Search size={18} />
-                        Buscar no PJe
+                    <button className="btn-primary" onClick={buscarPJe} disabled={dadosCarregados} style={{ height: '48px', opacity: dadosCarregados ? 0.6 : 1 }}>
+                        <Search size={18} /> Buscar no PJe
                     </button>
                     {dadosCarregados && (
-                        <button 
-                            className="btn-secondary"
-                            onClick={() => { setDadosCarregados(false); setFormData({}); setNumProcessoBusca(''); }}
-                        >
-                            Limpar
-                        </button>
+                        <button className="btn-secondary" onClick={() => { setDadosCarregados(false); setFormData({}); setNumProcessoBusca(''); }}>Limpar</button>
                     )}
                 </div>
             </div>
         )}
 
-        {/* SE FOR EDIÇÃO, mostramos o nº do processo como Info fixa */}
         {isEditMode && (
             <div style={{ marginBottom: '24px', padding: '16px', background: '#F8FAFC', border: '1px solid #E2E7ED', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <FileText size={20} color="#64748B" />
@@ -208,7 +192,6 @@ const NovoAssistido = () => {
 
         {(dadosCarregados || isEditMode) && (
             <>
-                {/* 1. DADOS PESSOAIS */}
                 <div className="form-section-title">
                     <FileText size={20} color="#0F99A8" />
                     Dados do Assistido {isEditMode ? '(Edição)' : '(PJe)'}
@@ -221,11 +204,7 @@ const NovoAssistido = () => {
                         {formData.nome !== originalData.nome && (
                             <div style={{ marginTop: '4px', padding: '8px', background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '6px' }}>
                                 <label style={{ fontSize: '11px', color: '#B45309' }}>Justificativa Obrigatória:</label>
-                                <input 
-                                    type="text" placeholder="Por que o nome foi alterado?" className="form-control" 
-                                    style={{ marginTop: '2px', height: '32px', fontSize: '12px', border: '1px solid #F59E0B' }}
-                                    onChange={(e) => handleJustificativa('nome', e.target.value)}
-                                />
+                                <input type="text" placeholder="Por que o nome foi alterado?" className="form-control" style={{ marginTop: '2px', height: '32px', fontSize: '12px', border: '1px solid #F59E0B' }} onChange={(e) => handleJustificativa('nome', e.target.value)} />
                             </div>
                         )}
                     </div>
@@ -246,87 +225,30 @@ const NovoAssistido = () => {
                         {formData.mae !== originalData.mae && (
                             <div style={{ marginTop: '4px', padding: '8px', background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: '6px' }}>
                                 <label style={{ fontSize: '11px', color: '#B45309' }}>Justificativa Obrigatória:</label>
-                                <input 
-                                    type="text" placeholder="Motivo da alteração..." className="form-control" 
-                                    style={{ marginTop: '2px', height: '32px', fontSize: '12px', border: '1px solid #F59E0B' }}
-                                    onChange={(e) => handleJustificativa('mae', e.target.value)}
-                                />
+                                <input type="text" placeholder="Motivo da alteração..." className="form-control" style={{ marginTop: '2px', height: '32px', fontSize: '12px', border: '1px solid #F59E0B' }} onChange={(e) => handleJustificativa('mae', e.target.value)} />
                             </div>
                         )}
                     </div>
 
-                    {/* Endereço */}
-                    <div className="input-group">
-                        <label>CEP</label>
-                        <input name="cep" value={formData.cep} onChange={handleChange} type="text" className="form-control" />
-                    </div>
-                    <div className="input-group" style={{ gridColumn: 'span 2' }}>
-                        <label>Logradouro e Número</label>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <input name="logradouro" value={formData.logradouro} onChange={handleChange} type="text" className="form-control" style={{ flex: 3 }} />
-                            <input name="numero" value={formData.numero} onChange={handleChange} type="text" className="form-control" style={{ flex: 1 }} />
-                        </div>
-                    </div>
-                    <div className="input-group">
-                        <label>Bairro</label>
-                        <input name="bairro" value={formData.bairro} onChange={handleChange} type="text" className="form-control" />
-                    </div>
-                    <div className="input-group" style={{ gridColumn: 'span 2' }}>
-                        <label>Cidade / UF</label>
-                        <input name="cidade" value={formData.cidade} onChange={handleChange} type="text" className="form-control" />
-                    </div>
+                    <div className="input-group"><label>CEP</label><input name="cep" value={formData.cep} onChange={handleChange} type="text" className="form-control" /></div>
+                    <div className="input-group" style={{ gridColumn: 'span 2' }}><label>Logradouro e Número</label><div style={{ display: 'flex', gap: '8px' }}><input name="logradouro" value={formData.logradouro} onChange={handleChange} type="text" className="form-control" style={{ flex: 3 }} /><input name="numero" value={formData.numero} onChange={handleChange} type="text" className="form-control" style={{ flex: 1 }} /></div></div>
+                    <div className="input-group"><label>Bairro</label><input name="bairro" value={formData.bairro} onChange={handleChange} type="text" className="form-control" /></div>
+                    <div className="input-group" style={{ gridColumn: 'span 2' }}><label>Cidade / UF</label><input name="cidade" value={formData.cidade} onChange={handleChange} type="text" className="form-control" /></div>
 
                     <div className="input-group" style={{ gridColumn: 'span 3', marginTop: '16px', padding: '16px', background: '#F8FAFC', border: '1px solid #E2E7ED', borderRadius: '8px' }}>
                         <label style={{ marginBottom: '8px', display: 'block' }}>Origem Processual</label>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            <div>
-                                <span style={{ fontSize: '12px', color: '#6A7282' }}>Vara</span>
-                                <div style={{ fontWeight: 'bold', color: '#1E2939' }}>{formData.vara}</div>
-                            </div>
-                            <div>
-                                <span style={{ fontSize: '12px', color: '#6A7282' }}>Comarca</span>
-                                <div style={{ fontWeight: 'bold', color: '#1E2939' }}>{formData.comarca}</div>
-                            </div>
+                            <div><span style={{ fontSize: '12px', color: '#6A7282' }}>Vara</span><div style={{ fontWeight: 'bold', color: '#1E2939' }}>{formData.vara}</div></div>
+                            <div><span style={{ fontSize: '12px', color: '#6A7282' }}>Comarca</span><div style={{ fontWeight: 'bold', color: '#1E2939' }}>{formData.comarca}</div></div>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. MAPA */}
-                <div className="form-section-title">
-                    <MapPin size={20} color="#0F99A8" />
-                    Configuração de Perímetro
-                </div>
-
+                <div className="form-section-title"><MapPin size={20} color="#0F99A8" /> Configuração de Perímetro</div>
                 <div className="form-grid">
-                    <div className="input-group">
-                        <label>Ponto de Monitoramento</label>
-                        <select 
-                            className="form-control" value={pontoMonitoramento} 
-                            onChange={(e) => {
-                                setPontoMonitoramento(e.target.value);
-                                if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); 
-                                else setCoords([-7.1215, -34.8650]); 
-                            }}
-                        >
-                            <option value="residencia">Residência do Assistido</option>
-                            <option value="forum">Fórum Criminal / Vara</option>
-                        </select>
-                    </div>
-
-                    <div className="input-group">
-                        <label>Raio Permitido</label>
-                        <select className="form-control" value={raioPerimetro} onChange={(e) => setRaioPerimetro(Number(e.target.value))}>
-                            <option value={0}>Exatamente no local (0m)</option>
-                            <option value={100}>100 metros</option>
-                            <option value={500}>500 metros</option>
-                            <option value={1000}>1 Km</option>
-                        </select>
-                    </div>
-
-                    <div className="input-group">
-                        <label>Endereço de Referência</label>
-                        <input type="text" className="form-control" value={pontoMonitoramento === 'residencia' ? `${formData.logradouro}, ${formData.numero}` : 'Fórum Criminal'} disabled />
-                    </div>
+                    <div className="input-group"><label>Ponto de Monitoramento</label><select className="form-control" value={pontoMonitoramento} onChange={(e) => { setPontoMonitoramento(e.target.value); if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); else setCoords([-7.1215, -34.8650]); }}><option value="residencia">Residência do Assistido</option><option value="forum">Fórum Criminal / Vara</option></select></div>
+                    <div className="input-group"><label>Raio Permitido</label><select className="form-control" value={raioPerimetro} onChange={(e) => setRaioPerimetro(Number(e.target.value))}><option value={0}>Exatamente no local (0m)</option><option value={100}>100 metros</option><option value={500}>500 metros</option><option value={1000}>1 Km</option></select></div>
+                    <div className="input-group"><label>Endereço de Referência</label><input type="text" className="form-control" value={pontoMonitoramento === 'residencia' ? `${formData.logradouro}, ${formData.numero}` : 'Fórum Criminal'} disabled /></div>
                 </div>
 
                 <div style={{ height: '400px', width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '32px', border: '1px solid #E2E7ED' }}>
@@ -338,14 +260,8 @@ const NovoAssistido = () => {
                     </MapContainer>
                 </div>
 
-                {/* 3. BIOMETRIA */}
-                <div className="form-section-title">
-                    <Camera size={20} color="#0F99A8" />
-                    {isEditMode ? 'Atualizar Biometria (Opcional)' : 'Coleta Biométrica (Obrigatória)'}
-                </div>
-
+                <div className="form-section-title"><Camera size={20} color="#0F99A8" /> {isEditMode ? 'Atualizar Biometria (Opcional)' : 'Coleta Biométrica (Obrigatória)'}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '24px', background: '#F8FAFC', borderRadius: '12px', border: '1px solid #E2E7ED' }}>
-                    
                     {!imgSrc ? (
                         <>
                             {cameraAtiva ? (
@@ -358,38 +274,22 @@ const NovoAssistido = () => {
                                     <span>Câmera desligada</span>
                                 </div>
                             )}
-
                             <div style={{ display: 'flex', gap: '16px' }}>
-                                {!cameraAtiva ? (
-                                    <button className="btn-primary" onClick={() => setCameraAtiva(true)}>Ligar Câmera</button>
-                                ) : (
-                                    <button className="btn-primary" onClick={capture}>Capturar Foto</button>
-                                )}
+                                {!cameraAtiva ? <button className="btn-primary" onClick={() => setCameraAtiva(true)}>Ligar Câmera</button> : <button className="btn-primary" onClick={capture}>Capturar Foto</button>}
                             </div>
                         </>
                     ) : (
                         <div style={{ textAlign: 'center' }}>
                             <img src={imgSrc} alt="Biometria" style={{ width: '320px', borderRadius: '8px', border: '2px solid #10B981' }} />
-                            <div style={{ marginTop: '16px' }}>
-                                <button className="btn-secondary" onClick={() => setImgSrc(null)}>
-                                    <ArrowLeft size={16} /> Refazer Foto
-                                </button>
-                            </div>
+                            <div style={{ marginTop: '16px' }}><button className="btn-secondary" onClick={() => setImgSrc(null)}><ArrowLeft size={16} /> Refazer Foto</button></div>
                         </div>
                     )}
                 </div>
 
-                {/* BOTÕES DE AÇÃO */}
                 <div className="form-actions">
                     <button className="btn-secondary" onClick={() => navigate('/assistidos')}>Cancelar</button>
-                    {!isEditMode && (
-                        <button className="btn-secondary" onClick={() => salvar('draft')}>
-                            <CornerDownRight size={18} /> Salvar Rascunho
-                        </button>
-                    )}
-                    <button className="btn-primary" onClick={() => salvar('final')}>
-                        <Save size={18} /> {isEditMode ? 'Salvar Alterações' : 'Finalizar Cadastro'}
-                    </button>
+                    {!isEditMode && <button className="btn-secondary" onClick={() => salvar('draft')}><CornerDownRight size={18} /> Salvar Rascunho</button>}
+                    <button className="btn-primary" onClick={() => salvar('final')}><Save size={18} /> {isEditMode ? 'Salvar Alterações' : 'Finalizar Cadastro'}</button>
                 </div>
             </>
         )}
