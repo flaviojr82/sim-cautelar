@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowLeft, MapPin, Calendar, FileText, Activity, 
-  CheckCircle, AlertTriangle, PlayCircle, PauseCircle, User 
+  CheckCircle, AlertTriangle, PlayCircle, PauseCircle, User, CalendarClock
 } from 'lucide-react';
 
 // Mapa
@@ -28,7 +28,7 @@ const DetalhesAssistido = () => {
   // Controle de Abas
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') === 'historico' ? 'historico' : 'dados');
 
-  // Dados Mockados (Agora com Ponto e Raio explícitos)
+  // Dados Mockados
   const assistido = {
       nome: 'Carlos Eduardo Silva',
       cpf: '098.112.334-12',
@@ -41,11 +41,16 @@ const DetalhesAssistido = () => {
       foto: 'https://ui-avatars.com/api/?name=Carlos+Silva&background=c7d2fe&color=3730a3',
       status: 'Regular',
       
-      // Novos Campos Solicitados
+      // Configuração de Mapa
       pontoMonitoramento: 'Residência do Assistido', 
-      raio: 500, // em metros
-      
-      coords: [-7.1350, -34.8750]
+      raio: 500,
+      coords: [-7.1350, -34.8750],
+
+      // --- NOVOS DADOS DE FREQUÊNCIA (Adicionados) ---
+      frequenciaTipo: 'Semanal',
+      frequenciaDetalhe: 'Segunda, Quarta e Sexta',
+      horarioTipo: 'Janela de Tempo',
+      horarioDetalhe: 'Entre 08:00 e 18:00'
   };
 
   // Histórico Mockado
@@ -106,6 +111,7 @@ const DetalhesAssistido = () => {
         {/* CONTEÚDO DA ABA DADOS */}
         {activeTab === 'dados' && (
             <div className="form-container">
+                {/* 1. Dados Pessoais */}
                 <div className="form-section-title">
                     <FileText size={20} color="#0F99A8" /> Dados Pessoais e Endereço
                 </div>
@@ -117,11 +123,35 @@ const DetalhesAssistido = () => {
                     <div className="input-group"><label>Comarca</label><div className="form-control" style={{ background: '#F8FAFC', border: 'none' }}>{assistido.comarca}</div></div>
                 </div>
 
+                {/* 2. NOVA SEÇÃO: Regras de Frequência */}
+                <div className="form-section-title">
+                    <CalendarClock size={20} color="#0F99A8" /> Regras de Frequência e Agendamento
+                </div>
+                <div className="form-grid" style={{ marginBottom: '32px' }}>
+                     <div className="input-group">
+                        <label>Periodicidade</label>
+                        <div className="form-control" style={{ background: '#F0FDFA', border: '1px solid #CCFBF1', color: '#0F766E', fontWeight: 'bold' }}>
+                            {assistido.frequenciaTipo}
+                        </div>
+                     </div>
+                     <div className="input-group">
+                        <label>Dias de Apresentação</label>
+                        <div className="form-control" style={{ background: '#F8FAFC', border: 'none' }}>
+                            {assistido.frequenciaDetalhe}
+                        </div>
+                     </div>
+                     <div className="input-group">
+                        <label>Horário ({assistido.horarioTipo})</label>
+                        <div className="form-control" style={{ background: '#F8FAFC', border: 'none' }}>
+                            {assistido.horarioDetalhe}
+                        </div>
+                     </div>
+                </div>
+
+                {/* 3. Mapa */}
                 <div className="form-section-title">
                     <MapPin size={20} color="#0F99A8" /> Perímetro Monitorado
                 </div>
-
-                {/* --- NOVOS CAMPOS ADICIONADOS AQUI --- */}
                 <div className="form-grid" style={{ marginBottom: '16px' }}>
                      <div className="input-group">
                         <label>Ponto de Monitoramento</label>
