@@ -3,7 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import CheckIn from './pages/CheckIn';
-import Justificativa from './pages/Justificativa'; // Importar
+import Justificativa from './pages/Justificativa';
+import Historico from './pages/Historico'; // Importar
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/checkin" element={<CheckIn />} />
-        <Route path="/justificativa" element={<Justificativa />} /> {/* Nova Rota */}
+        <Route path="/justificativa" element={<Justificativa />} />
+        <Route path="/historico" element={<Historico />} /> {/* Nova Rota */}
         
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
