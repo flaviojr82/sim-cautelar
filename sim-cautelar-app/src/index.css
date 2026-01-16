@@ -1,0 +1,105 @@
+:root {
+  /* Identidade Visual TJPB (Mesma do Admin) */
+  --primary: #0F99A8;
+  --primary-hover: #0d8a96;
+  --bg-color: #F8FAFC;
+  --text-primary: #1E2939;
+  --text-secondary: #64748B;
+  --border-color: #E2E7ED;
+  --error: #EF4444;
+  --success: #10B981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent; /* Remove highlight azul no mobile */
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- COMPONENTES PADRÃO (Mobile First) --- */
+
+/* Botão Grande e Fácil de Tocar */
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  height: 56px; /* Altura maior para toque */
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 6px rgba(15, 153, 168, 0.2);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  height: 56px;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Inputs Otimizados */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  height: 56px; /* Altura maior para digitar fácil */
+  padding: 0 16px;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  font-size: 16px; /* Evita zoom automático no iOS */
+  outline: none;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 153, 168, 0.1);
+}
+
+/* Utilitários */
+.text-center { text-align: center; }
+.mb-4 { margin-bottom: 16px; }
+.mt-4 { margin-top: 16px; }
