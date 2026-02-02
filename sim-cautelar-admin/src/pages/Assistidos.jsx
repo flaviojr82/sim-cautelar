@@ -24,8 +24,15 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const Assistidos = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const filtroStatus = queryParams.get('filtro');
   
   // -- ESTADOS GERAIS --
+  // Inicializa mostrarInativos como true se o filtro da URL for um status inativo
+  const [mostrarInativos, setMostrarInativos] = useState(() => {
+    return ['draft', 'ready', 'suspended'].includes(filtroStatus);
+  });
+
   const [busca, setBusca] = useState('');
   const [menuAberto, setMenuAberto] = useState(null);
   
@@ -45,8 +52,6 @@ const Assistidos = () => {
   const [acaoPenalidade, setAcaoPenalidade] = useState('advertencia'); // advertencia, diligencia, juizo
 
   const webcamRef = useRef(null);
-  const queryParams = new URLSearchParams(location.search);
-  const filtroStatus = queryParams.get('filtro');
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -129,9 +134,22 @@ const Assistidos = () => {
   const assistidosFiltrados = baseDeDados.filter((item) => {
     const termo = busca.toLowerCase();
     const matchTexto = item.nome.toLowerCase().includes(termo) || item.cpf.includes(termo) || item.processo.includes(termo);
+    
+    // Lógica de Filtro por Status
+    const statusInativos = ['draft', 'ready', 'suspended'];
+    const isInactive = statusInativos.includes(item.status);
+
+    // Se a opção de mostrar inativos estiver desmarcada, e o item for inativo, remove.
+    if (!mostrarInativos && isInactive) return false;
+
     let matchStatus = true;
-    if (filtroStatus === 'monitored') matchStatus = item.status !== 'suspended' && item.status !== 'draft' && item.status !== 'ready';
-    else if (filtroStatus) matchStatus = item.status === filtroStatus;
+    if (filtroStatus === 'monitored') {
+        // Se filtro for 'monitored', remove inativos (já tratado acima, mas reforça)
+        matchStatus = !isInactive;
+    } else if (filtroStatus) {
+        matchStatus = item.status === filtroStatus;
+    }
+
     return matchTexto && matchStatus;
   });
 
@@ -171,11 +189,23 @@ const Assistidos = () => {
          )}
       </div>
 
-      <div className="action-bar">
-        <div className="search-wrapper">
-            <Search className="search-icon" size={20} />
-            <input type="text" className="search-input" placeholder="Buscar por nome, CPF ou nº do processo..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+      <div className="action-bar" style={{ alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="search-wrapper">
+                <Search className="search-icon" size={20} />
+                <input type="text" className="search-input" placeholder="Buscar por nome, CPF ou nº do processo..." value={busca} onChange={(e) => setBusca(e.target.value)} />
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#64748B', cursor: 'pointer', marginLeft: '2px' }}>
+                <input 
+                    type="checkbox" 
+                    checked={mostrarInativos} 
+                    onChange={(e) => setMostrarInativos(e.target.checked)} 
+                    style={{ accentColor: '#0F99A8', width: '16px', height: '16px', cursor: 'pointer' }}
+                />
+                Mostrar assistidos inativos (Rascunho, Cadastrado, Suspenso)
+            </label>
         </div>
+        
         <button className="btn-primary" onClick={() => navigate('/assistidos/novo')}>
             <Plus size={20} /> Cadastrar Assistido
         </button>
@@ -268,7 +298,7 @@ const Assistidos = () => {
                       );
                   })
                 ) : (
-                  <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center' }}>Nenhum registro.</td></tr>
+                  <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center' }}>Nenhum registro encontrado.</td></tr>
                 )}
             </tbody>
         </table>
@@ -349,95 +379,53 @@ const Assistidos = () => {
                                                 <CarFront size={24} color="#2563EB" /><div><div style={{ fontWeight: '600', color: '#1E2939' }}>Solicitar Diligência</div><div style={{ fontSize: '12px', color: '#64748B' }}>Solicita visita de Oficial de Justiça à residência.</div></div>
                                             </div>
                                             <div onClick={() => setAcaoPenalidade('juizo')} style={{ padding: '16px', borderRadius: '8px', border: acaoPenalidade === 'juizo' ? '2px solid #EF4444' : '1px solid #E2E7ED', background: acaoPenalidade === 'juizo' ? '#FEF2F2' : 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                <Gavel size={24} color="#DC2626" /><div><div style={{ fontWeight: '600', color: '#1E2939' }}>Comunicar ao Juízo</div><div style={{ fontSize: '12px', color: '#64748B' }}>Gera relatório de violação grave para apreciação judicial.</div></div>
+                                                <Gavel size={24} color="#EF4444" /><div><div style={{ fontWeight: '600', color: '#1E2939' }}>Relatar ao Juízo</div><div style={{ fontSize: '12px', color: '#64748B' }}>Envia relatório de violação para o processo judicial.</div></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="input-group"><label>Justificativa da Medida</label><textarea className="form-control" rows="2" placeholder="Detalhes..." value={obsModal} onChange={(e) => setObsModal(e.target.value)}></textarea></div>
                                 </div>
                             )}
                         </>
                     )}
 
-                    {/* === CHECK-IN PRESENCIAL === */}
-                    {modalType === 'presencial' && (
+                    {/* === SUSPENDER / REATIVAR / PRESENCIAL === */}
+                    {(modalType === 'suspender' || modalType === 'reativar' || modalType === 'presencial') && (
                         <>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #F1F5F9' }}>
-                                <img src={selectedUser?.foto} alt="Referência" style={{ width: '100px', height: '100px', borderRadius: '50%', border: '4px solid #F0F9FF', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
-                                <span style={{ fontSize: '12px', color: '#64748B', marginTop: '8px' }}>Foto de Referência (Cadastro)</span>
-                            </div>
-                            <div style={{ marginBottom: '24px' }}>
-                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1E2939' }}>Método de Validação</label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                                    <button onClick={() => setMetodoValidacao('visual')} style={{ padding: '12px', borderRadius: '8px', border: metodoValidacao === 'visual' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'visual' ? '#F0FDFA' : 'white', color: metodoValidacao === 'visual' ? '#0F766E' : '#64748B', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                                        <Eye size={24} /> <span style={{ fontWeight: '600' }}>Confirmação Visual</span>
-                                    </button>
-                                    <button onClick={() => setMetodoValidacao('facial')} style={{ padding: '12px', borderRadius: '8px', border: metodoValidacao === 'facial' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'facial' ? '#F0FDFA' : 'white', color: metodoValidacao === 'facial' ? '#0F766E' : '#64748B', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                                        <Camera size={24} /> <span style={{ fontWeight: '600' }}>Biometria Facial</span>
-                                    </button>
-                                </div>
-                            </div>
-                            {metodoValidacao === 'facial' ? (
-                                <div style={{ marginBottom: '24px', padding: '16px', background: '#F8FAFC', borderRadius: '8px', border: '1px solid #E2E7ED', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    {!imgSrc ? (
-                                        <>
-                                            {cameraAtiva ? <div style={{ width: '100%', height: '240px', background: 'black', borderRadius: '8px', overflow: 'hidden', marginBottom: '16px' }}><Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width="100%" height="100%" videoConstraints={{ facingMode: "user" }} /></div> : <div style={{ width: '100%', height: '160px', background: '#E2E7ED', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748B', marginBottom: '16px' }}><Camera size={40} style={{ opacity: 0.5, marginBottom: '8px' }} /><span>Câmera desligada</span></div>}
-                                            {!cameraAtiva ? <button className="btn-primary" onClick={() => setCameraAtiva(true)}>Ligar Câmera</button> : <button className="btn-primary" onClick={capture}>Capturar Biometria</button>}
-                                        </>
-                                    ) : (
-                                        <div style={{ textAlign: 'center' }}><img src={imgSrc} alt="Captura" style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #10B981' }} /><div style={{ marginTop: '8px', color: '#10B981', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><CheckCircle size={16} /> Biometria Capturada</div><button className="btn-secondary" onClick={() => setImgSrc(null)} style={{ marginTop: '8px' }}>Refazer</button></div>
+                            {modalType === 'presencial' && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    <div><label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>Método de Validação</label><div style={{ display: 'flex', gap: '10px' }}><button onClick={() => setMetodoValidacao('visual')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: metodoValidacao === 'visual' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'visual' ? '#ECFEFF' : 'white', fontWeight: '600', color: metodoValidacao === 'visual' ? '#0F99A8' : '#64748B', cursor: 'pointer' }}>Conferência Visual</button><button onClick={() => setMetodoValidacao('facial')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: metodoValidacao === 'facial' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'facial' ? '#ECFEFF' : 'white', fontWeight: '600', color: metodoValidacao === 'facial' ? '#0F99A8' : '#64748B', cursor: 'pointer' }}>Biometria Facial</button></div></div>
+                                    {metodoValidacao === 'facial' && (
+                                        <div style={{ textAlign: 'center', border: '1px solid #E2E7ED', borderRadius: '8px', padding: '16px', background: '#F8FAFC' }}>
+                                            {!cameraAtiva && !imgSrc && <button onClick={() => setCameraAtiva(true)} className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}><Camera size={18} /> Abrir Câmera</button>}
+                                            {cameraAtiva && <div style={{ position: 'relative' }}><Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width="100%" videoConstraints={{ facingMode: "user" }} /><button onClick={capture} style={{ position: 'absolute', bottom: '10px', left: '50%', transform: 'translateX(-50%)', padding: '10px 20px', background: '#EF4444', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold' }}>Capturar</button></div>}
+                                            {imgSrc && <div style={{ position: 'relative' }}><img src={imgSrc} alt="Capture" style={{ width: '100%', borderRadius: '8px' }} /><button onClick={() => { setImgSrc(null); setCameraAtiva(true); }} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer' }}><X size={16} /></button></div>}
+                                        </div>
                                     )}
                                 </div>
-                            ) : (
-                                <div style={{ marginBottom: '24px', padding: '16px', background: '#FFF7ED', borderRadius: '8px', border: '1px solid #FED7AA', color: '#9A3412', display: 'flex', gap: '12px' }}><AlertCircle size={24} style={{ flexShrink: 0 }} /><div style={{ fontSize: '13px' }}><strong>Termo de Responsabilidade:</strong><br/>Ao selecionar esta opção, declaro que realizei a conferência visual do assistido.</div></div>
                             )}
-                        </>
-                    )}
 
-                    {/* SUSPENDER / REATIVAR - CORRIGIDO (COMPLETO) */}
-                    {(modalType === 'suspender' || modalType === 'reativar') && (
-                        <>
-                           {modalType === 'suspender' ? (
-                               <>
-                                   <div className="input-group">
-                                       <label>Motivo da Suspensão</label>
-                                       <select className="form-control" value={motivoSusp} onChange={(e) => setMotivoSusp(e.target.value)}>
-                                           <option value="">Selecione...</option>
-                                           <option value="alvara">Alvará de Soltura (Fim de Pena)</option>
-                                           <option value="hospital">Internação Hospitalar</option>
-                                           <option value="fuga">Evasão / Fuga (Mandado de Prisão)</option>
-                                           <option value="obito">Óbito</option>
-                                           <option value="outros">Outros (Justificar)</option>
-                                       </select>
-                                   </div>
-                                   <div className="input-group" style={{ marginTop: '16px' }}>
-                                       <label>Observações</label>
-                                       <textarea className="form-control" rows="3" placeholder="Detalhes adicionais..." value={obsModal} onChange={(e) => setObsModal(e.target.value)}></textarea>
-                                   </div>
-                               </>
-                           ) : (
-                               <div style={{ padding: '16px', background: '#F0FDFA', color: '#0F766E' }}>Monitoramento será reativado.</div>
-                           )} 
+                            {modalType === 'suspender' && (
+                                <div className="input-group"><label>Motivo da Suspensão</label><textarea className="form-control" rows="3" placeholder="Ex: Alvará de soltura, Transferência, Óbito..." value={motivoSusp} onChange={(e) => setMotivoSusp(e.target.value)}></textarea></div>
+                            )}
+
+                            {modalType === 'reativar' && (
+                                <div style={{ padding: '16px', background: '#F0FDFA', borderRadius: '8px', color: '#0F766E', fontSize: '14px' }}>Confirmar a reativação fará com que o assistido volte a ser monitorado pelas regras vigentes.</div>
+                            )}
                         </>
                     )}
                 </div>
 
                 <div className="modal-footer">
-                    {modalType === 'analisar' && stepAnalise === 2 && (
-                         <button className="btn-secondary" onClick={() => setStepAnalise(1)} style={{ marginRight: 'auto' }}><ArrowLeft size={16} /> Voltar</button>
-                    )}
                     <button className="btn-secondary" onClick={closeModal}>Cancelar</button>
-                    {modalType === 'analisar' ? (
-                        stepAnalise === 1 ? (
-                            <>
-                                <button className="btn-secondary" style={{ color: '#EF4444', borderColor: '#EF4444' }} onClick={() => setStepAnalise(2)}>Confirmar Irregularidade</button>
-                                <button className="btn-primary" style={{ backgroundColor: '#10B981', borderColor: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Aceitar Justificativa</button>
-                            </>
-                        ) : (
-                            <button className="btn-primary" style={{ backgroundColor: '#EF4444', borderColor: '#EF4444' }} onClick={() => handleConfirmAction('aplicar_penalidade')}>Aplicar Medida</button>
-                        )
+                    {modalType === 'analisar' && stepAnalise === 1 ? (
+                        <>
+                            <button className="btn-primary" style={{ background: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Validar (Aceitar)</button>
+                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Irregularidade (Punnir)</button>
+                        </>
                     ) : (
-                        <button className={`btn-primary ${modalType === 'suspender' ? 'danger' : ''}`} onClick={() => handleConfirmAction()} style={modalType === 'suspender' ? { backgroundColor: '#EF4444', borderColor: '#EF4444' } : {}}>{modalType === 'suspender' ? 'Confirmar Suspensão' : 'Confirmar'}</button>
+                        <button className="btn-primary" onClick={() => handleConfirmAction()} disabled={modalType === 'suspender' && !motivoSusp}>
+                            {modalType === 'analisar' ? 'Confirmar Decisão' : 'Confirmar'}
+                        </button>
                     )}
                 </div>
             </div>
