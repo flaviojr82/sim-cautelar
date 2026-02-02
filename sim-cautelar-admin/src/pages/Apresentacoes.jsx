@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Layout from '../components/Layout';
-import { Search, MapPin, CheckCircle, FileText, Download, UserCheck } from 'lucide-react';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Removido 'Download' da importação, pois era usado apenas no botão de relatório
+import { Search, MapPin, CheckCircle, FileText, UserCheck } from 'lucide-react';
+
+// Removidas as importações do jsPDF e autoTable
 
 const Apresentacoes = () => {
   const [busca, setBusca] = useState('');
 
-  // 1. DADOS MOCKADOS (Incluindo "Apresentação Presencial")
+  // 1. DADOS MOCKADOS (Mantidos inalterados)
   const checkinsHoje = [
     { 
       id: 1, 
@@ -27,7 +28,6 @@ const Apresentacoes = () => {
       metodo: 'Reconhecimento Facial', 
       foto: 'https://ui-avatars.com/api/?name=Carlos+Silva&background=c7d2fe&color=3730a3' 
     },
-    // --- NOVO CENÁRIO: PRESENCIAL ---
     { 
       id: 3, 
       nome: 'Julia Mendes', 
@@ -66,77 +66,7 @@ const Apresentacoes = () => {
     );
   });
 
-  // 3. Exportar PDF
-  const exportarRelatorio = () => {
-    try {
-      const doc = new jsPDF();
-
-      // Cabeçalho
-      doc.setFillColor(63, 111, 116); 
-      doc.rect(0, 0, 210, 40, 'F');
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Tribunal de Justiça da Paraíba', 14, 18);
-      
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text('SiM Cautelar - Monitoramento Eletrônico', 14, 26);
-
-      // Info
-      doc.setTextColor(30, 41, 57);
-      doc.setFontSize(14);
-      doc.text('Relatório Diário de Apresentações', 14, 50);
-      
-      const dataHoje = new Date().toLocaleDateString('pt-BR');
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text(`Gerado em: ${dataHoje}`, 14, 56);
-      doc.text(`Total de Registros: ${dadosFiltrados.length}`, 14, 61);
-
-      // Tabela
-      const corpoTabela = dadosFiltrados.map(item => [
-          item.nome,
-          item.cpf,
-          item.hora,
-          item.local,
-          item.metodo
-      ]);
-
-      autoTable(doc, {
-          startY: 70,
-          head: [['Nome do Assistido', 'CPF', 'Horário', 'Localização', 'Validação']],
-          body: corpoTabela,
-          theme: 'grid',
-          headStyles: { 
-              fillColor: [15, 153, 168],
-              textColor: 255,
-              fontStyle: 'bold',
-              halign: 'left'
-          },
-          bodyStyles: { textColor: 50 },
-          alternateRowStyles: { fillColor: [245, 245, 245] },
-          styles: { font: 'helvetica', fontSize: 9, cellPadding: 4 }
-      });
-
-      // Rodapé
-      const pageCount = doc.internal.getNumberOfPages();
-      for(let i = 1; i <= pageCount; i++) {
-          doc.setPage(i);
-          doc.setFontSize(8);
-          doc.setTextColor(150);
-          doc.text('Documento oficial gerado pelo sistema SiM Cautelar.', 14, doc.internal.pageSize.height - 10);
-          doc.text(`Página ${i} de ${pageCount}`, doc.internal.pageSize.width - 25, doc.internal.pageSize.height - 10);
-      }
-
-      doc.save(`Relatorio_Apresentacoes_${dataHoje.replace(/\//g, '-')}.pdf`);
-
-    } catch (error) {
-      console.error("Erro ao gerar PDF:", error);
-      alert("Houve um erro ao gerar o relatório.");
-    }
-  };
+  // A função exportarRelatorio foi removida completamente daqui.
 
   return (
     <Layout>
@@ -157,14 +87,7 @@ const Apresentacoes = () => {
             />
         </div>
         
-        <button 
-            className="btn-primary" 
-            onClick={exportarRelatorio}
-            style={{ background: 'white', color: '#1E2939', border: '1px solid #E2E7ED' }}
-        >
-            <Download size={18} color="#0F99A8" />
-            Exportar Relatório
-        </button>
+        {/* O botão foi removido e não há mais lógica de PDF no componente */}
       </div>
 
       <div className="table-container">
@@ -181,7 +104,6 @@ const Apresentacoes = () => {
             <tbody>
                 {dadosFiltrados.length > 0 ? (
                     dadosFiltrados.map((item) => {
-                        // Verifica se é presencial para mudar a cor do badge
                         const isPresencial = item.metodo === 'Apresentação Presencial';
 
                         return (
@@ -209,7 +131,6 @@ const Apresentacoes = () => {
                                       gap: '6px',
                                       padding: '4px 8px', 
                                       borderRadius: '6px', 
-                                      // Se presencial, usa Roxo. Se não, usa Azul.
                                       background: isPresencial ? '#F5F3FF' : '#F0F9FF', 
                                       color: isPresencial ? '#7C3AED' : '#0369A1', 
                                       fontSize: '12px',
@@ -246,7 +167,6 @@ const Apresentacoes = () => {
             {dadosFiltrados.length > 0 && (
                 <div style={{ fontSize: '12px', color: '#0F99A8' }}>
                     <FileText size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}/>
-                    Relatório pronto para exportação
                 </div>
             )}
         </div>

@@ -9,7 +9,6 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const menuItems = [
     { label: 'Início', path: '/', icon: LayoutDashboard },
     { label: 'Assistidos', path: '/assistidos', icon: Users },
-    { label: 'Relatórios', path: '/relatorios', icon: FileText },
   ];
 
   return (
