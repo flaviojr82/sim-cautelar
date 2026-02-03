@@ -268,18 +268,18 @@ const Assistidos = () => {
                                       {item.status === 'draft' ? (
                                         <>
                                             <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Continuar Editando</button>
-      <button className="dropdown-item" onClick={() => alert("Migração: Abrir formulário de novo processo.")}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
-      <div className="dropdown-divider"></div>
-      <button className="dropdown-item danger"><Trash2 size={16} /> Excluir Rascunho</button>
-  </>
-) : (
-  <>
-      <button className="dropdown-item" onClick={() => navigate(`/assistidos/detalhes/${item.id}`)}><Eye size={16} color="#64748B" /> Ver Detalhes</button>
-      {item.status !== 'suspended' && item.status !== 'ready' && (
-          <button className="dropdown-item" onClick={() => openModal('presencial', item)}><UserCheck size={16} color="#0F99A8" /> Apresentação Presencial</button>
-      )}
-      <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Editar Cadastro</button>
-      <button className="dropdown-item" onClick={() => alert("Migração: Abrir formulário de novo processo.")}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
+                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}?mode=migration`)}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
+                                            <div className="dropdown-divider"></div>
+                                            <button className="dropdown-item danger"><Trash2 size={16} /> Excluir Rascunho</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/detalhes/${item.id}`)}><Eye size={16} color="#64748B" /> Ver Detalhes</button>
+                                      {item.status !== 'suspended' && item.status !== 'ready' && (
+                                            <button className="dropdown-item" onClick={() => openModal('presencial', item)}><UserCheck size={16} color="#0F99A8" /> Apresentação Presencial</button>
+                                    )}
+                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Editar Cadastro</button>
+                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}?mode=migration`)}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
                                             {item.status !== 'ready' && (
                                                 <>
                                                     <div className="dropdown-divider"></div>
@@ -422,7 +422,7 @@ const Assistidos = () => {
                     {modalType === 'analisar' && stepAnalise === 1 ? (
                         <>
                             <button className="btn-primary" style={{ background: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Validar (Aceitar)</button>
-                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Irregularidade (Punnir)</button>
+                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Irregularidade (Punir)</button>
                         </>
                     ) : (
                         <button className="btn-primary" onClick={() => handleConfirmAction()} disabled={modalType === 'suspender' && !motivoSusp}>

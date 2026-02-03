@@ -60,7 +60,7 @@ const DetalhesAssistido = () => {
       { id: 3, data: '10/01/2026 19:45', tipo: 'alerta', titulo: 'Alerta de Horário', desc: 'Tentativa de check-in fora do horário permitido.', icon: AlertTriangle, color: '#F59E0B' },
       { id: 4, data: '01/01/2026 09:00', tipo: 'inicio', titulo: 'Início do Monitoramento', desc: 'Cadastro ativado pelo sistema.', icon: PlayCircle, color: '#3B82F6' },
       { id: 5, data: '01/01/2026 08:30', tipo: 'cadastro', titulo: 'Cadastro Realizado', desc: 'Usuário Admin criou o registro.', icon: User, color: '#64748B' },
-  ];
+      ];
 
   return (
     <Layout>
