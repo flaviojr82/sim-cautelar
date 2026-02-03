@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { 
   Search, Plus, MoreVertical, AlertCircle, 
   Eye, Edit3, Ban, X, UserCheck, PauseCircle, PlayCircle, Trash2, 
-  Camera, CheckCircle, AlertTriangle, MapPin, Clock, XCircle,
+  Camera, CheckCircle, AlertTriangle, Hash, MapPin, Clock, XCircle,
   AlertOctagon, CarFront, Gavel, ArrowLeft
 } from 'lucide-react';
 import Webcam from 'react-webcam';
@@ -256,7 +256,7 @@ const Assistidos = () => {
                                         <button className="dropdown-item" style={{ color: '#0F99A8', fontWeight: 'bold' }} onClick={() => alert("Monitoramento Iniciado!")}><PlayCircle size={16} /> Iniciar Monitoramento</button>
                                       )}
                                       
-                                      {item.status === 'analysis' && (
+                                      {(item.status === 'analysis' || item.status === 'alert') && (
                                         <>
                                             <button className="dropdown-item" style={{ color: '#D97706', fontWeight: 'bold' }} onClick={() => openModal('analisar', item)}>
                                                 <AlertTriangle size={16} /> Resolver Pendência
@@ -264,20 +264,22 @@ const Assistidos = () => {
                                             <div className="dropdown-divider"></div>
                                         </>
                                       )}
-
+                                
                                       {item.status === 'draft' ? (
                                         <>
                                             <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Continuar Editando</button>
-                                            <div className="dropdown-divider"></div>
-                                            <button className="dropdown-item danger"><Trash2 size={16} /> Excluir Rascunho</button>
-                                        </>
-                                      ) : (
-                                        <>
-                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/detalhes/${item.id}`)}><Eye size={16} color="#64748B" /> Ver Detalhes</button>
-                                            {item.status !== 'suspended' && item.status !== 'ready' && (
-                                                <button className="dropdown-item" onClick={() => openModal('presencial', item)}><UserCheck size={16} color="#0F99A8" /> Apresentação Presencial</button>
-                                            )}
-                                            <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Editar Cadastro</button>
+      <button className="dropdown-item" onClick={() => alert("Migração: Abrir formulário de novo processo.")}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
+      <div className="dropdown-divider"></div>
+      <button className="dropdown-item danger"><Trash2 size={16} /> Excluir Rascunho</button>
+  </>
+) : (
+  <>
+      <button className="dropdown-item" onClick={() => navigate(`/assistidos/detalhes/${item.id}`)}><Eye size={16} color="#64748B" /> Ver Detalhes</button>
+      {item.status !== 'suspended' && item.status !== 'ready' && (
+          <button className="dropdown-item" onClick={() => openModal('presencial', item)}><UserCheck size={16} color="#0F99A8" /> Apresentação Presencial</button>
+      )}
+      <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Editar Cadastro</button>
+      <button className="dropdown-item" onClick={() => alert("Migração: Abrir formulário de novo processo.")}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
                                             {item.status !== 'ready' && (
                                                 <>
                                                     <div className="dropdown-divider"></div>
