@@ -286,7 +286,7 @@ const Assistidos = () => {
                                                     {item.status === 'suspended' ? (
                                                         <button className="dropdown-item" style={{ color: '#10B981' }} onClick={() => openModal('reativar', item)}><PauseCircle size={16} /> Reativar Monitoramento</button>
                                                     ) : (
-                                                        <button className="dropdown-item danger" onClick={() => openModal('suspender', item)}><Ban size={16} /> Suspender</button>
+                                                        <button className="dropdown-item danger" onClick={() => openModal('suspender', item)}><Ban size={16} /> Suspender Monitoramento</button>
                                                     )}
                                                 </>
                                             )}
@@ -421,8 +421,8 @@ const Assistidos = () => {
                     <button className="btn-secondary" onClick={closeModal}>Cancelar</button>
                     {modalType === 'analisar' && stepAnalise === 1 ? (
                         <>
-                            <button className="btn-primary" style={{ background: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Validar (Aceitar)</button>
-                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Irregularidade (Punir)</button>
+                            <button className="btn-primary" style={{ background: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Aceitar</button>
+                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Comunicar ao PJe</button>
                         </>
                     ) : (
                         <button className="btn-primary" onClick={() => handleConfirmAction()} disabled={modalType === 'suspender' && !motivoSusp}>

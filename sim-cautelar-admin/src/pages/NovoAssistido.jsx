@@ -37,8 +37,6 @@ const NovoAssistido = () => {
   // -- ESTADOS GERAIS --
   const [numProcessoBusca, setNumProcessoBusca] = useState('');
   const [dadosCarregados, setDadosCarregados] = useState(false);
-  
-  // Novo estado para controlar a lista de partes encontradas
   const [partesEncontradas, setPartesEncontradas] = useState([]);
   
   const [formData, setFormData] = useState({
@@ -54,12 +52,13 @@ const NovoAssistido = () => {
   const [pontoMonitoramento, setPontoMonitoramento] = useState('residencia');
   const [raioPerimetro, setRaioPerimetro] = useState(500);
   const [coords, setCoords] = useState([-7.1195, -34.8450]);
-  const [semPerimetro, setSemPerimetro] = useState(false); // NOVO ESTADO
+  const [semPerimetro, setSemPerimetro] = useState(false);
 
   // -- AGENDAMENTO / FREQUÊNCIA --
   const [frequencia, setFrequencia] = useState('diario');
   const [tipoHorario, setTipoHorario] = useState('janela');
-  
+  const [intervaloDias, setIntervaloDias] = useState(15); 
+
   const [horaCheckin, setHoraCheckin] = useState('08:00');
   const [janelaInicio, setJanelaInicio] = useState('08:00');
   const [janelaFim, setJanelaFim] = useState('18:00');
@@ -101,27 +100,26 @@ const NovoAssistido = () => {
     }
   }, [id, isEditMode]);
 
-  // -- NOVA LOGICA DE BUSCA: TRAZ AS PARTES, NAO PREENCHE DIRETO --
   const buscarPJe = () => {
     if (!numProcessoBusca) return alert("Digite um número de processo.");
     
     const partesDoProcesso = [
         {
-            tipo: 'Polo Passivo', // Removido (Réu)
+            tipo: 'Polo Passivo', 
             nome: 'José da Silva Moura', cpf: '111.222.333-44', nascimento: '1985-05-20', mae: 'Maria da Silva Moura',
             email: 'jose.moura@email.com',
             cep: '58000-000', logradouro: 'Av. Epitácio Pessoa', numero: '1000', bairro: 'Estados', cidade: 'João Pessoa - PB',
             artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
         },
         {
-            tipo: 'Polo Passivo', // Removido (Corréu)
+            tipo: 'Polo Passivo', 
             nome: 'Antônio Ferreira Junior', cpf: '222.333.444-55', nascimento: '1990-02-15', mae: 'Joana Ferreira',
             email: 'antonio.jr@email.com',
             cep: '58030-000', logradouro: 'Rua da Areia', numero: '50', bairro: 'Varadouro', cidade: 'João Pessoa - PB',
             artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
         },
         {
-            tipo: 'Polo Ativo', // Removido (Vítima)
+            tipo: 'Polo Ativo',
             nome: 'Supermercado Preço Bom LTDA', cpf: '12.345.678/0001-90', nascimento: '', mae: '',
             email: 'contato@precobom.com.br',
             cep: '58000-100', logradouro: 'Rua Principal', numero: '100', bairro: 'Centro', cidade: 'João Pessoa - PB',
@@ -161,14 +159,35 @@ const NovoAssistido = () => {
     setCameraAtiva(false);
   }, [webcamRef]);
 
+  // --- FUNÇÃO SALVAR ATUALIZADA ---
   const salvar = (tipo) => {
+      // Validação básica
       if (!isEditMode && tipo === 'final' && !imgSrc) return alert("É obrigatório capturar a foto para finalizar o cadastro inicial.");
       
-      const msg = isEditMode 
-        ? "Alterações salvas com sucesso! (Dados atualizados)" 
-        : (tipo === 'draft' ? "Rascunho salvo com sucesso!" : "Cadastro finalizado e pronto para monitoramento!");
+      // Caso 1: Rascunho ou Edição (Fluxo normal sem pergunta)
+      if (isEditMode || tipo === 'draft') {
+          const msg = isEditMode 
+            ? "Alterações salvas com sucesso! (Dados atualizados)" 
+            : "Rascunho salvo com sucesso!";
+          alert(msg);
+          navigate('/assistidos');
+          return;
+      }
+
+      // Caso 2: Novo Cadastro Finalizado (Pergunta sobre monitoramento)
+      // Aqui simularíamos o POST para o backend salvando o usuário
       
-      alert(msg);
+      // Pergunta de fluxo
+      const desejaIniciar = window.confirm("Cadastro finalizado com sucesso!\n\nDeseja iniciar o monitoramento deste assistido de imediato?");
+
+      if (desejaIniciar) {
+          // Lógica de ativação imediata (simulada)
+          alert("Monitoramento Iniciado! O status do assistido agora é 'Regular'.");
+      } else {
+          // Lógica de manter inativo/pendente
+          alert("Cadastro Salvo. O monitoramento poderá ser iniciado posteriormente através da lista de assistidos.");
+      }
+
       navigate('/assistidos');
   };
 
@@ -291,7 +310,7 @@ const NovoAssistido = () => {
                     </div>
                 </div>
 
-                {/* 2. MAPA E PERÍMETRO (ALTERADO COM CHECKBOX) */}
+                {/* 2. MAPA E PERÍMETRO */}
                 <div className="form-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <MapPin size={20} color="#0F99A8" /> Configuração de Perímetro
@@ -325,25 +344,108 @@ const NovoAssistido = () => {
                     </>
                 )}
 
-                {/* 3. REGRAS DE FREQUÊNCIA */}
+                {/* 3. REGRAS DE FREQUÊNCIA E AGENDAMENTO */}
                 <div className="form-section-title"><Calendar size={20} color="#0F99A8" /> Regras de Frequência e Agendamento</div>
                 <div className="form-container" style={{ padding: '24px', background: '#F8FAFC', border: '1px solid #E2E7ED', borderRadius: '12px', marginBottom: '32px' }}>
-                    <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid #E2E7ED', paddingBottom: '16px' }}>
+                    <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', borderBottom: '1px solid #E2E7ED', paddingBottom: '16px', flexWrap: 'wrap' }}>
                         <button onClick={() => setFrequencia('diario')} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: frequencia === 'diario' ? '#0F99A8' : 'white', color: frequencia === 'diario' ? 'white' : '#64748B', cursor: 'pointer', fontWeight: '600' }}>Diário</button>
                         <button onClick={() => setFrequencia('semanal')} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: frequencia === 'semanal' ? '#0F99A8' : 'white', color: frequencia === 'semanal' ? 'white' : '#64748B', cursor: 'pointer', fontWeight: '600' }}>Semanal</button>
                         <button onClick={() => setFrequencia('mensal')} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: frequencia === 'mensal' ? '#0F99A8' : 'white', color: frequencia === 'mensal' ? 'white' : '#64748B', cursor: 'pointer', fontWeight: '600' }}>Mensal</button>
+                        <button onClick={() => setFrequencia('intervalo')} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: frequencia === 'intervalo' ? '#0F99A8' : 'white', color: frequencia === 'intervalo' ? 'white' : '#64748B', cursor: 'pointer', fontWeight: '600' }}>Por Intervalo</button>
                     </div>
+                    
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                        {/* COLUNA ESQUERDA: CONFIG DA FREQUENCIA */}
                         <div>
-                            <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1E2939' }}>{frequencia === 'diario' && 'Todos os dias'}{frequencia === 'semanal' && 'Dias da Semana'}{frequencia === 'mensal' && 'Dia ou Período do Mês'}</label>
+                            <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1E2939' }}>
+                                {frequencia === 'diario' && 'Todos os dias'}
+                                {frequencia === 'semanal' && 'Dias da Semana'}
+                                {frequencia === 'mensal' && 'Dia ou Período do Mês'}
+                                {frequencia === 'intervalo' && 'Definir Intervalo'}
+                            </label>
+                            
                             {frequencia === 'diario' && <div style={{ fontSize: '14px', color: '#64748B' }}>O assistido deverá realizar o check-in diariamente.</div>}
-                            {frequencia === 'semanal' && (<div style={{ display: 'flex', gap: '8px' }}>{['dom','seg','ter','qua','qui','sex','sab'].map(d => (<button key={d} onClick={() => toggleDiaSemana(d)} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #E2E7ED', background: diasSemana.includes(d) ? '#0F99A8' : 'white', color: diasSemana.includes(d) ? 'white' : '#64748B', cursor: 'pointer', textTransform: 'uppercase', fontSize: '12px', fontWeight: 'bold' }}>{d.charAt(0)}</button>))}</div>)}
-                            {frequencia === 'mensal' && (<div><div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}><label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoMensal === 'dia_fixo'} onChange={() => setTipoMensal('dia_fixo')} /> Dia Fixo</label><label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoMensal === 'periodo'} onChange={() => setTipoMensal('periodo')} /> Período</label></div>{tipoMensal === 'dia_fixo' ? (<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Todo dia <input type="number" min="1" max="31" value={diaMes} onChange={(e) => setDiaMes(e.target.value)} className="form-control" style={{ width: '70px' }} /></div>) : (<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Entre dia <input type="number" min="1" max="31" value={diaMesInicio} onChange={(e) => setDiaMesInicio(e.target.value)} className="form-control" style={{ width: '60px' }} /> e <input type="number" min="1" max="31" value={diaMesFim} onChange={(e) => setDiaMesFim(e.target.value)} className="form-control" style={{ width: '60px' }} /></div>)}</div>)}
+                            
+                            {frequencia === 'semanal' && (
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    {['dom','seg','ter','qua','qui','sex','sab'].map(d => (
+                                        <button key={d} onClick={() => toggleDiaSemana(d)} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #E2E7ED', background: diasSemana.includes(d) ? '#0F99A8' : 'white', color: diasSemana.includes(d) ? 'white' : '#64748B', cursor: 'pointer', textTransform: 'uppercase', fontSize: '12px', fontWeight: 'bold' }}>
+                                            {d.charAt(0)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            
+                            {frequencia === 'mensal' && (
+                                <div>
+                                    <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoMensal === 'dia_fixo'} onChange={() => setTipoMensal('dia_fixo')} /> Dia Fixo</label>
+                                        <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoMensal === 'periodo'} onChange={() => setTipoMensal('periodo')} /> Período</label>
+                                    </div>
+                                    {tipoMensal === 'dia_fixo' ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Todo dia <input type="number" min="1" max="31" value={diaMes} onChange={(e) => setDiaMes(e.target.value)} className="form-control" style={{ width: '70px' }} /></div>
+                                    ) : (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>Entre dia <input type="number" min="1" max="31" value={diaMesInicio} onChange={(e) => setDiaMesInicio(e.target.value)} className="form-control" style={{ width: '60px' }} /> e <input type="number" min="1" max="31" value={diaMesFim} onChange={(e) => setDiaMesFim(e.target.value)} className="form-control" style={{ width: '60px' }} /></div>
+                                    )}
+                                </div>
+                            )}
+
+                            {frequencia === 'intervalo' && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#1E2939' }}>
+                                    Apresentar-se a cada 
+                                    <input 
+                                        type="number" 
+                                        min="1" 
+                                        value={intervaloDias} 
+                                        onChange={(e) => setIntervaloDias(e.target.value)} 
+                                        className="form-control" 
+                                        style={{ width: '80px', textAlign: 'center' }} 
+                                    />
+                                    dias.
+                                </div>
+                            )}
                         </div>
+
+                        {/* COLUNA DIREITA: CONFIG DO HORARIO */}
                         <div>
                             <label style={{ display: 'block', marginBottom: '12px', fontWeight: '600', color: '#1E2939' }}>Horário do Check-in</label>
-                            <div style={{ display: 'flex', gap: '16px', marginBottom: '12px' }}><label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoHorario === 'fixo'} onChange={() => setTipoHorario('fixo')} /> Hora Fixa</label><label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}><input type="radio" checked={tipoHorario === 'janela'} onChange={() => setTipoHorario('janela')} /> Janela de Tempo</label></div>
-                            {tipoHorario === 'fixo' ? (<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Clock size={16} color="#64748B" /><input type="time" value={horaCheckin} onChange={(e) => setHoraCheckin(e.target.value)} className="form-control" style={{ width: '120px' }} /><span style={{ fontSize: '12px', color: '#64748B' }}>(Tol. 15 min)</span></div>) : (<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><span>De</span><input type="time" value={janelaInicio} onChange={(e) => setJanelaInicio(e.target.value)} className="form-control" style={{ width: '100px' }} /><span>até</span><input type="time" value={janelaFim} onChange={(e) => setJanelaFim(e.target.value)} className="form-control" style={{ width: '100px' }} /></div>)}
+                            
+                            <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                                    <input type="radio" checked={tipoHorario === 'fixo'} onChange={() => setTipoHorario('fixo')} /> Hora Fixa
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                                    <input type="radio" checked={tipoHorario === 'janela'} onChange={() => setTipoHorario('janela')} /> Janela de Tempo
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', cursor: 'pointer' }}>
+                                    <input type="radio" checked={tipoHorario === 'dia_inteiro'} onChange={() => setTipoHorario('dia_inteiro')} /> O Dia Inteiro
+                                </label>
+                            </div>
+
+                            {/* LOGICA DE EXIBICAO DOS INPUTS DE HORA */}
+                            {tipoHorario === 'fixo' && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Clock size={16} color="#64748B" />
+                                    <input type="time" value={horaCheckin} onChange={(e) => setHoraCheckin(e.target.value)} className="form-control" style={{ width: '120px' }} />
+                                    <span style={{ fontSize: '12px', color: '#64748B' }}>(Tol. 15 min)</span>
+                                </div>
+                            )}
+
+                            {tipoHorario === 'janela' && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span>De</span>
+                                    <input type="time" value={janelaInicio} onChange={(e) => setJanelaInicio(e.target.value)} className="form-control" style={{ width: '100px' }} />
+                                    <span>até</span>
+                                    <input type="time" value={janelaFim} onChange={(e) => setJanelaFim(e.target.value)} className="form-control" style={{ width: '100px' }} />
+                                </div>
+                            )}
+
+                            {tipoHorario === 'dia_inteiro' && (
+                                <div style={{ padding: '8px 12px', background: '#E0F2FE', borderRadius: '6px', color: '#0369A1', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <CheckCircle size={16} />
+                                    O assistido poderá realizar o check-in em qualquer horário entre 00:00 e 23:59.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
