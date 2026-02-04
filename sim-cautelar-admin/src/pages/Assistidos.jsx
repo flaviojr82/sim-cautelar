@@ -272,12 +272,17 @@ const Assistidos = () => {
                                             <div className="dropdown-divider"></div>
                                             <button className="dropdown-item danger"><Trash2 size={16} /> Excluir Rascunho</button>
                                         </>
-                                    ) : (
+                                      ) : (
                                         <>
                                             <button className="dropdown-item" onClick={() => navigate(`/assistidos/detalhes/${item.id}`)}><Eye size={16} color="#64748B" /> Ver Detalhes</button>
                                       {item.status !== 'suspended' && item.status !== 'ready' && (
-                                            <button className="dropdown-item" onClick={() => openModal('presencial', item)}><UserCheck size={16} color="#0F99A8" /> Apresentação Presencial</button>
-                                    )}
+                                            <button className="dropdown-item" onClick={() => openModal('presencial', item)}>
+                                                <UserCheck size={16} color="#0F99A8" /> 
+                                                Apresentação Presencial
+                                                {/* --- ALTERAÇÃO 1: Ícone indicador de foto --- */}
+                                                <Camera size={14} style={{ marginLeft: 'auto', color: '#94A3B8' }} />
+                                            </button>
+                                      )}
                                             <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}`)}><Edit3 size={16} color="#64748B" /> Editar Cadastro</button>
                                             <button className="dropdown-item" onClick={() => navigate(`/assistidos/editar/${item.id}?mode=migration`)}><Hash size={16} color="#64748B" /> Migrar Número de Processo</button>
                                             {item.status !== 'ready' && (
@@ -395,6 +400,19 @@ const Assistidos = () => {
                         <>
                             {modalType === 'presencial' && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                    
+                                    {/* --- ALTERAÇÃO 2: Visualização da Foto de Cadastro --- */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+                                        <div style={{ width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden', border: '4px solid #F1F5F9', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+                                            {selectedUser?.foto ? (
+                                                <img src={selectedUser.foto} alt="Cadastro" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
+                                            ) : (
+                                                <Camera size={40} color="#CBD5E1" />
+                                            )}
+                                        </div>
+                                        <span style={{ fontSize: '12px', color: '#64748B', fontWeight: '500' }}>Foto de Cadastro</span>
+                                    </div>
+
                                     <div><label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600' }}>Método de Validação</label><div style={{ display: 'flex', gap: '10px' }}><button onClick={() => setMetodoValidacao('visual')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: metodoValidacao === 'visual' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'visual' ? '#ECFEFF' : 'white', fontWeight: '600', color: metodoValidacao === 'visual' ? '#0F99A8' : '#64748B', cursor: 'pointer' }}>Conferência Visual</button><button onClick={() => setMetodoValidacao('facial')} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: metodoValidacao === 'facial' ? '2px solid #0F99A8' : '1px solid #E2E7ED', background: metodoValidacao === 'facial' ? '#ECFEFF' : 'white', fontWeight: '600', color: metodoValidacao === 'facial' ? '#0F99A8' : '#64748B', cursor: 'pointer' }}>Biometria Facial</button></div></div>
                                     {metodoValidacao === 'facial' && (
                                         <div style={{ textAlign: 'center', border: '1px solid #E2E7ED', borderRadius: '8px', padding: '16px', background: '#F8FAFC' }}>
