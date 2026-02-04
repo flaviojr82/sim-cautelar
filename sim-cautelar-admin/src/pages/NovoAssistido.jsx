@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   Search, MapPin, Save, Camera, FileText, 
-  CornerDownRight, ArrowLeft, Edit3, Calendar, Clock, Mail
+  CornerDownRight, ArrowLeft, Calendar, Clock, User, CheckCircle
 } from 'lucide-react';
 
 // --- MAPA ---
@@ -38,7 +38,9 @@ const NovoAssistido = () => {
   const [numProcessoBusca, setNumProcessoBusca] = useState('');
   const [dadosCarregados, setDadosCarregados] = useState(false);
   
-  // Adicionado o campo 'email' ao estado inicial
+  // Novo estado para controlar a lista de partes encontradas
+  const [partesEncontradas, setPartesEncontradas] = useState([]);
+  
   const [formData, setFormData] = useState({
       nome: '', cpf: '', nascimento: '', mae: '', email: '',
       cep: '', logradouro: '', numero: '', bairro: '', cidade: '',
@@ -48,10 +50,11 @@ const NovoAssistido = () => {
   const [originalData, setOriginalData] = useState({});
   const [justificativas, setJustificativas] = useState({});
   
-  // -- MAPA --
+  // -- MAPA / PERÍMETRO --
   const [pontoMonitoramento, setPontoMonitoramento] = useState('residencia');
   const [raioPerimetro, setRaioPerimetro] = useState(500);
   const [coords, setCoords] = useState([-7.1195, -34.8450]);
+  const [semPerimetro, setSemPerimetro] = useState(false); // NOVO ESTADO
 
   // -- AGENDAMENTO / FREQUÊNCIA --
   const [frequencia, setFrequencia] = useState('diario');
@@ -71,14 +74,14 @@ const NovoAssistido = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const [cameraAtiva, setCameraAtiva] = useState(false);
 
-  // -- CARREGAR DADOS (SIMULAÇÃO) --
+  // -- CARREGAR DADOS (EDICAO) --
   useEffect(() => {
     if (isEditMode) {
         let dadosSimulados = {};
         if (id === '1') { 
             dadosSimulados = {
                 nome: 'Carlos Eduardo Silva', cpf: '098.112.334-12', nascimento: '1990-03-12', mae: 'Ana Silva', 
-                email: 'carlos.silva@email.com', // Mock de email
+                email: 'carlos.silva@email.com',
                 cep: '58000-100', logradouro: 'Rua das Acácias', numero: '400', bairro: 'Torre', cidade: 'João Pessoa - PB',
                 artigo: 'Art. 157', vara: '2ª Vara Criminal', comarca: 'João Pessoa', processo: '0004321-88.2024.8.15.2001'
             };
@@ -98,18 +101,44 @@ const NovoAssistido = () => {
     }
   }, [id, isEditMode]);
 
+  // -- NOVA LOGICA DE BUSCA: TRAZ AS PARTES, NAO PREENCHE DIRETO --
   const buscarPJe = () => {
     if (!numProcessoBusca) return alert("Digite um número de processo.");
-    const dadosPJe = {
-        nome: 'José da Silva Moura', cpf: '111.222.333-44', nascimento: '1985-05-20', mae: 'Maria da Silva Moura',
-        email: 'jose.moura@email.com',
-        cep: '58000-000', logradouro: 'Av. Epitácio Pessoa', numero: '1000', bairro: 'Estados', cidade: 'João Pessoa - PB',
-        artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
-    };
-    setFormData(dadosPJe);
-    setOriginalData(dadosPJe);
-    setDadosCarregados(true);
-    setCoords([-7.1215, -34.8650]);
+    
+    const partesDoProcesso = [
+        {
+            tipo: 'Polo Passivo', // Removido (Réu)
+            nome: 'José da Silva Moura', cpf: '111.222.333-44', nascimento: '1985-05-20', mae: 'Maria da Silva Moura',
+            email: 'jose.moura@email.com',
+            cep: '58000-000', logradouro: 'Av. Epitácio Pessoa', numero: '1000', bairro: 'Estados', cidade: 'João Pessoa - PB',
+            artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
+        },
+        {
+            tipo: 'Polo Passivo', // Removido (Corréu)
+            nome: 'Antônio Ferreira Junior', cpf: '222.333.444-55', nascimento: '1990-02-15', mae: 'Joana Ferreira',
+            email: 'antonio.jr@email.com',
+            cep: '58030-000', logradouro: 'Rua da Areia', numero: '50', bairro: 'Varadouro', cidade: 'João Pessoa - PB',
+            artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
+        },
+        {
+            tipo: 'Polo Ativo', // Removido (Vítima)
+            nome: 'Supermercado Preço Bom LTDA', cpf: '12.345.678/0001-90', nascimento: '', mae: '',
+            email: 'contato@precobom.com.br',
+            cep: '58000-100', logradouro: 'Rua Principal', numero: '100', bairro: 'Centro', cidade: 'João Pessoa - PB',
+            artigo: 'Art. 157 - Roubo Majorado', vara: '1ª Vara Criminal', comarca: 'João Pessoa', processo: numProcessoBusca
+        }
+    ];
+
+    setPartesEncontradas(partesDoProcesso);
+    setDadosCarregados(false); 
+  };
+
+  const selecionarParte = (parte) => {
+      setFormData(parte);
+      setOriginalData(parte);
+      setDadosCarregados(true);
+      setPartesEncontradas([]); 
+      setCoords([-7.1215, -34.8650]); 
   };
 
   const handleChange = (e) => {
@@ -157,16 +186,55 @@ const NovoAssistido = () => {
                 <div className="form-section-title" style={{ marginBottom: '16px', color: '#0369A1', border: 'none' }}>
                     <Search size={20} /> Importar Dados do PJe
                 </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end' }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
                     <div className="input-group" style={{ flex: 1 }}>
                         <label>Número do Processo (CNJ)</label>
-                        <input type="text" className="form-control" placeholder="0000000-00.0000.8.15.0000" value={numProcessoBusca} onChange={(e) => setNumProcessoBusca(e.target.value)} disabled={dadosCarregados} />
+                        <input type="text" className="form-control" placeholder="0000000-00.0000.8.15.0000" value={numProcessoBusca} onChange={(e) => setNumProcessoBusca(e.target.value)} disabled={dadosCarregados || partesEncontradas.length > 0} />
                     </div>
-                    <button className="btn-primary" onClick={buscarPJe} disabled={dadosCarregados} style={{ height: '48px', opacity: dadosCarregados ? 0.6 : 1 }}>
+                    <button className="btn-primary" onClick={buscarPJe} disabled={dadosCarregados || partesEncontradas.length > 0} style={{ height: '48px', opacity: (dadosCarregados || partesEncontradas.length > 0) ? 0.6 : 1 }}>
                         <Search size={18} /> Buscar no PJe
                     </button>
-                    {dadosCarregados && <button className="btn-secondary" onClick={() => { setDadosCarregados(false); setFormData({}); setNumProcessoBusca(''); }}>Limpar</button>}
+                    {(dadosCarregados || partesEncontradas.length > 0) && <button className="btn-secondary" onClick={() => { setDadosCarregados(false); setFormData({}); setPartesEncontradas([]); setNumProcessoBusca(''); }}>Limpar Busca</button>}
                 </div>
+
+                {partesEncontradas.length > 0 && !dadosCarregados && (
+                    <div style={{ marginTop: '16px', borderTop: '1px solid #BAE6FD', paddingTop: '16px' }}>
+                        <h4 style={{ color: '#0369A1', marginBottom: '12px', fontSize: '14px' }}>Selecione a pessoa a ser monitorada:</h4>
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                            {partesEncontradas.map((parte, index) => (
+                                <div key={index} onClick={() => selecionarParte(parte)} 
+                                     style={{ 
+                                        background: 'white', padding: '16px', borderRadius: '8px', border: '1px solid #E2E7ED', 
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                                     }}
+                                     onMouseEnter={(e) => e.currentTarget.style.borderColor = '#0F99A8'}
+                                     onMouseLeave={(e) => e.currentTarget.style.borderColor = '#E2E7ED'}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ background: '#E0F2FE', padding: '8px', borderRadius: '50%', color: '#0369A1' }}>
+                                            <User size={20} />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontWeight: 'bold', color: '#1E2939' }}>{parte.nome}</div>
+                                            <div style={{ fontSize: '12px', color: '#64748B' }}>CPF/CNPJ: {parte.cpf}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span style={{ 
+                                            fontSize: '11px', fontWeight: 'bold', padding: '4px 8px', borderRadius: '12px', 
+                                            background: parte.tipo.includes('Polo Passivo') ? '#FEF2F2' : '#F0FDF4',
+                                            color: parte.tipo.includes('Polo Passivo') ? '#B91C1C' : '#15803D'
+                                        }}>
+                                            {parte.tipo}
+                                        </span>
+                                        <div style={{ fontSize: '11px', color: '#94A3B8', marginTop: '4px' }}>Clique para selecionar</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         )}
 
@@ -180,8 +248,7 @@ const NovoAssistido = () => {
 
         {(dadosCarregados || isEditMode) && (
             <>
-                {/* 1. DADOS PESSOAIS */}
-                <div className="form-section-title"><FileText size={20} color="#0F99A8" /> Dados do Assistido {isEditMode ? '(Edição)' : '(PJe)'}</div>
+                <div className="form-section-title"><FileText size={20} color="#0F99A8" /> Dados do Assistido {isEditMode ? '(Edição)' : '(Importado do PJe)'}</div>
                 <div className="form-grid">
                     <div className="input-group" style={{ gridColumn: 'span 2' }}>
                         <label>Nome Completo</label>
@@ -199,13 +266,11 @@ const NovoAssistido = () => {
                         <input name="nascimento" value={formData.nascimento} onChange={handleChange} type="date" className="form-control" />
                     </div>
 
-                    {/* Novo Campo de E-mail */}
                     <div className="input-group" style={{ gridColumn: 'span 2' }}>
                         <label>E-mail para Contato</label>
                         <input name="email" value={formData.email} onChange={handleChange} type="email" className="form-control" placeholder="exemplo@email.com" />
                     </div>
                     
-                    {/* Nome da Mãe agora ocupa a linha inteira (span 3) */}
                     <div className="input-group" style={{ gridColumn: 'span 3' }}>
                         <label>Nome da Mãe</label>
                         <input name="mae" value={formData.mae} onChange={handleChange} type="text" className="form-control" />
@@ -226,21 +291,39 @@ const NovoAssistido = () => {
                     </div>
                 </div>
 
-                {/* 2. MAPA */}
-                <div className="form-section-title"><MapPin size={20} color="#0F99A8" /> Configuração de Perímetro</div>
-                <div className="form-grid">
-                    <div className="input-group"><label>Ponto de Monitoramento</label><select className="form-control" value={pontoMonitoramento} onChange={(e) => { setPontoMonitoramento(e.target.value); if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); else setCoords([-7.1215, -34.8650]); }}><option value="residencia">Residência do Assistido</option><option value="forum">Fórum Criminal / Vara</option></select></div>
-                    <div className="input-group"><label>Raio Permitido</label><select className="form-control" value={raioPerimetro} onChange={(e) => setRaioPerimetro(Number(e.target.value))}><option value={0}>Exatamente no local (0m)</option><option value={100}>100 metros</option><option value={500}>500 metros</option><option value={1000}>1 Km</option></select></div>
-                    <div className="input-group"><label>Endereço de Referência</label><input type="text" className="form-control" value={pontoMonitoramento === 'residencia' ? `${formData.logradouro}, ${formData.numero}` : 'Fórum Criminal'} disabled /></div>
+                {/* 2. MAPA E PERÍMETRO (ALTERADO COM CHECKBOX) */}
+                <div className="form-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <MapPin size={20} color="#0F99A8" /> Configuração de Perímetro
+                    </div>
+                    <label style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#64748B', fontWeight: 'normal' }}>
+                        <input 
+                            type="checkbox" 
+                            checked={semPerimetro} 
+                            onChange={(e) => setSemPerimetro(e.target.checked)} 
+                            style={{ width: '16px', height: '16px', accentColor: '#0F99A8' }}
+                        />
+                        Não Definir Perímetro
+                    </label>
                 </div>
-                <div style={{ height: '300px', width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '32px', border: '1px solid #E2E7ED' }}>
-                    <MapContainer center={coords} zoom={15} style={{ height: '100%', width: '100%' }}>
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
-                        <RecenterMap coords={coords} />
-                        <Marker position={coords} />
-                        <Circle center={coords} radius={raioPerimetro} pathOptions={{ color: '#0F99A8', fillColor: '#0F99A8', fillOpacity: 0.2 }} />
-                    </MapContainer>
-                </div>
+
+                {!semPerimetro && (
+                    <>
+                        <div className="form-grid">
+                            <div className="input-group"><label>Ponto de Monitoramento</label><select className="form-control" value={pontoMonitoramento} onChange={(e) => { setPontoMonitoramento(e.target.value); if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); else setCoords([-7.1215, -34.8650]); }}><option value="residencia">Residência do Assistido</option><option value="forum">Fórum Criminal / Vara</option></select></div>
+                            <div className="input-group"><label>Raio Permitido</label><select className="form-control" value={raioPerimetro} onChange={(e) => setRaioPerimetro(Number(e.target.value))}><option value={0}>Exatamente no local (0m)</option><option value={100}>100 metros</option><option value={500}>500 metros</option><option value={1000}>1 Km</option></select></div>
+                            <div className="input-group"><label>Endereço de Referência</label><input type="text" className="form-control" value={pontoMonitoramento === 'residencia' ? `${formData.logradouro}, ${formData.numero}` : 'Fórum Criminal'} disabled /></div>
+                        </div>
+                        <div style={{ height: '300px', width: '100%', borderRadius: '12px', overflow: 'hidden', marginBottom: '32px', border: '1px solid #E2E7ED' }}>
+                            <MapContainer center={coords} zoom={15} style={{ height: '100%', width: '100%' }}>
+                                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap' />
+                                <RecenterMap coords={coords} />
+                                <Marker position={coords} />
+                                <Circle center={coords} radius={raioPerimetro} pathOptions={{ color: '#0F99A8', fillColor: '#0F99A8', fillOpacity: 0.2 }} />
+                            </MapContainer>
+                        </div>
+                    </>
+                )}
 
                 {/* 3. REGRAS DE FREQUÊNCIA */}
                 <div className="form-section-title"><Calendar size={20} color="#0F99A8" /> Regras de Frequência e Agendamento</div>
