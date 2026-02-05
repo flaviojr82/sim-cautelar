@@ -42,6 +42,7 @@ const Assistidos = () => {
   
   // Estados Internos
   const [motivoSusp, setMotivoSusp] = useState('');
+  const [justificativaSusp, setJustificativaSusp] = useState(''); // Novo estado para a justificativa
   const [obsModal, setObsModal] = useState('');
   const [metodoValidacao, setMetodoValidacao] = useState('visual');
   const [cameraAtiva, setCameraAtiva] = useState(false);
@@ -69,6 +70,7 @@ const Assistidos = () => {
     
     // Reset de todos os estados
     setMotivoSusp('');
+    setJustificativaSusp(''); // Resetando a justificativa
     setObsModal('');
     setMetodoValidacao('visual');
     setCameraAtiva(false);
@@ -96,7 +98,16 @@ const Assistidos = () => {
         if (metodoValidacao === 'facial' && !imgSrc) return alert("Capture a foto para validar.");
         msg = `Apresentação Presencial registrada com sucesso!`;
     } 
-    else if (modalType === 'suspender') msg = `Checagem SUSPENSA! Motivo: ${motivoSusp}`;
+    else if (modalType === 'suspender') {
+        // Validação básica
+        if (!motivoSusp) return alert("Por favor, selecione um motivo.");
+        
+        // Mensagem solicitada
+        msg = `Sucesso: A checagem foi suspensa corretamente.`;
+        
+        // Log para depuração (opcional, mostra que os dados foram capturados)
+        console.log("Suspensão:", { motivo: motivoSusp, justificativa: justificativaSusp });
+    }
     else if (modalType === 'reativar') msg = `Checagem REATIVADA!`;
     
     // Lógica do Modal de Análise
@@ -424,8 +435,31 @@ const Assistidos = () => {
                                 </div>
                             )}
 
+                            {/* --- ALTERAÇÃO SOLICITADA: MODAL DE SUSPENSÃO ATUALIZADO --- */}
                             {modalType === 'suspender' && (
-                                <div className="input-group"><label>Motivo da Suspensão</label><textarea className="form-control" rows="3" placeholder="Ex: Alvará de soltura, Transferência, Óbito..." value={motivoSusp} onChange={(e) => setMotivoSusp(e.target.value)}></textarea></div>
+                                <>
+                                    <div className="input-group">
+                                        <label>Motivo da Suspensão</label>
+                                        <select className="form-control" value={motivoSusp} onChange={(e) => setMotivoSusp(e.target.value)}>
+                                            <option value="" disabled>Selecione uma opção...</option>
+                                            <option value="Alvará">Alvará</option>
+                                            <option value="Óbito">Óbito</option>
+                                            <option value="Hospitalizado">Hospitalizado</option>
+                                            <option value="Fuga">Fuga</option>
+                                            <option value="Outros">Outros</option>
+                                        </select>
+                                    </div>
+                                    <div className="input-group" style={{ marginTop: '16px' }}>
+                                        <label>Justificativa / Observações</label>
+                                        <textarea 
+                                            className="form-control" 
+                                            rows="3" 
+                                            placeholder="Descreva detalhes adicionais..." 
+                                            value={justificativaSusp} 
+                                            onChange={(e) => setJustificativaSusp(e.target.value)}
+                                        ></textarea>
+                                    </div>
+                                </>
                             )}
 
                             {modalType === 'reativar' && (
