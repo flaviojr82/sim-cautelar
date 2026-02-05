@@ -96,8 +96,8 @@ const Assistidos = () => {
         if (metodoValidacao === 'facial' && !imgSrc) return alert("Capture a foto para validar.");
         msg = `Apresentação Presencial registrada com sucesso!`;
     } 
-    else if (modalType === 'suspender') msg = `Monitoramento SUSPENSO! Motivo: ${motivoSusp}`;
-    else if (modalType === 'reativar') msg = `Monitoramento REATIVADO!`;
+    else if (modalType === 'suspender') msg = `Checagem SUSPENSA! Motivo: ${motivoSusp}`;
+    else if (modalType === 'reativar') msg = `Checagem REATIVADA!`;
     
     // Lógica do Modal de Análise
     else if (modalType === 'analisar') {
@@ -127,7 +127,7 @@ const Assistidos = () => {
     { id: 4, nome: 'Marcos Vinicius Dias', cpf: '999.888.777-66', processo: '0001234-55.2024.8.15.0001', status: 'analysis', ultimaSinc: 'Atraso (Fora do Horário)', foto: 'https://ui-avatars.com/api/?name=Marcos+Dias&background=fef3c7&color=d97706', analiseTipo: 'time', analiseDetalhe: 'Apresentação realizada às 20:45. Limite era 19:00.' },
     { id: 5, nome: 'João Pedro Santos', cpf: '321.654.987-56', processo: '0007766-44.2024.8.15.2001', status: 'active', ultimaSinc: 'Há 1 min (Reconhecimento Facial)', foto: 'https://ui-avatars.com/api/?name=Joao+Santos&background=fed7aa&color=9a3412' },
     { id: 6, nome: 'Ricardo Oliveira', cpf: '444.555.666-77', processo: '0002233-44.2024.8.15.0001', status: 'analysis', ultimaSinc: 'Biometria Inconclusiva (Score Baixo)', foto: 'https://ui-avatars.com/api/?name=Ricardo+Oliveira&background=fef3c7&color=d97706', analiseTipo: 'bio', analiseDetalhe: 'Score de similaridade: 52% (Mínimo exigido: 90%).', fotoCheckin: 'https://ui-avatars.com/api/?name=Desconhecido&background=000&color=fff' },
-    { id: 7, nome: 'Paulo Ricardo Gomes', cpf: '111.222.333-44', processo: '0008899-77.2022.8.15.2001', status: 'suspended', ultimaSinc: 'Monitoramento Encerrado (Alvará)', foto: 'https://ui-avatars.com/api/?name=Paulo+Gomes&background=f1f5f9&color=64748b' },
+    { id: 7, nome: 'Paulo Ricardo Gomes', cpf: '111.222.333-44', processo: '0008899-77.2022.8.15.2001', status: 'suspended', ultimaSinc: 'Checagem Encerrado (Alvará)', foto: 'https://ui-avatars.com/api/?name=Paulo+Gomes&background=f1f5f9&color=64748b' },
     { id: 8, nome: 'Julia Mendes', cpf: '222.333.444-55', processo: '0006655-22.2023.8.15.2001', status: 'active', ultimaSinc: 'Apresentação Presencial (Fórum)', foto: 'https://ui-avatars.com/api/?name=Julia+Mendes&background=bbf7d0&color=166534' },
   ];
 
@@ -168,7 +168,7 @@ const Assistidos = () => {
   };
 
   const getFiltroLabel = () => {
-    if (filtroStatus === 'monitored') return 'Apenas Monitorados (Ativos)';
+    if (filtroStatus === 'monitored') return 'Apenas Checado (Ativos)';
     if (filtroStatus === 'alert') return 'Irregulares';
     if (filtroStatus === 'analysis') return 'Em Análise';
     return '';
@@ -253,7 +253,7 @@ const Assistidos = () => {
                                   {menuAberto === item.id && (
                                     <div className={`dropdown-menu ${isLastRow ? 'upwards' : ''}`}>
                                       {item.status === 'ready' && (
-                                        <button className="dropdown-item" style={{ color: '#0F99A8', fontWeight: 'bold' }} onClick={() => alert("Monitoramento Iniciado!")}><PlayCircle size={16} /> Iniciar Monitoramento</button>
+                                        <button className="dropdown-item" style={{ color: '#0F99A8', fontWeight: 'bold' }} onClick={() => alert("Checagem Iniciada!")}><PlayCircle size={16} /> Iniciar Checagem</button>
                                       )}
                                       
                                       {(item.status === 'analysis' || item.status === 'alert') && (
@@ -289,9 +289,9 @@ const Assistidos = () => {
                                                 <>
                                                     <div className="dropdown-divider"></div>
                                                     {item.status === 'suspended' ? (
-                                                        <button className="dropdown-item" style={{ color: '#10B981' }} onClick={() => openModal('reativar', item)}><PauseCircle size={16} /> Reativar Monitoramento</button>
+                                                        <button className="dropdown-item" style={{ color: '#10B981' }} onClick={() => openModal('reativar', item)}><PauseCircle size={16} /> Reativar Checagem</button>
                                                     ) : (
-                                                        <button className="dropdown-item danger" onClick={() => openModal('suspender', item)}><Ban size={16} /> Suspender Monitoramento</button>
+                                                        <button className="dropdown-item danger" onClick={() => openModal('suspender', item)}><Ban size={16} /> Suspender Checagem</button>
                                                     )}
                                                 </>
                                             )}
@@ -324,8 +324,8 @@ const Assistidos = () => {
             <div className="modal-content" style={(modalType === 'presencial' || modalType === 'analisar') ? { maxWidth: '600px' } : {}}>
                 <div className="modal-header">
                     <div className="modal-title">
-                        {modalType === 'suspender' && <><Ban size={24} color="#EF4444" /> Suspender Monitoramento</>}
-                        {modalType === 'reativar' && <><PlayCircle size={24} color="#10B981" /> Reativar Monitoramento</>}
+                        {modalType === 'suspender' && <><Ban size={24} color="#EF4444" /> Suspender Checagem</>}
+                        {modalType === 'reativar' && <><PlayCircle size={24} color="#10B981" /> Reativar Checagem</>}
                         {modalType === 'presencial' && <><UserCheck size={24} color="#0F99A8" /> Check-in Presencial</>}
                         {modalType === 'analisar' && (stepAnalise === 1 ? <><AlertTriangle size={24} color="#D97706" /> Analisar Ocorrência</> : <><Gavel size={24} color="#EF4444" /> Definir Medida Disciplinar</>)}
                     </div>
@@ -429,7 +429,7 @@ const Assistidos = () => {
                             )}
 
                             {modalType === 'reativar' && (
-                                <div style={{ padding: '16px', background: '#F0FDFA', borderRadius: '8px', color: '#0F766E', fontSize: '14px' }}>Confirmar a reativação fará com que o assistido volte a ser monitorado pelas regras vigentes.</div>
+                                <div style={{ padding: '16px', background: '#F0FDFA', borderRadius: '8px', color: '#0F766E', fontSize: '14px' }}>Confirmar a reativação fará com que o assistido volte a ser checado pelas regras vigentes.</div>
                             )}
                         </>
                     )}

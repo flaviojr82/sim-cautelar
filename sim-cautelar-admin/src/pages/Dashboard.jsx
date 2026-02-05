@@ -44,7 +44,7 @@ const Dashboard = () => {
       <div className="kpi-grid">
          {/* 1. Total Monitorados: 7 (8 cadastros - 1 suspenso) */}
          <div onClick={() => handleCardClick('total')}>
-            <KPICard title="Total Monitorados" value="07" icon={Users} />
+            <KPICard title="Total Checados" value="07" icon={Users} />
          </div>
 
          {/* 2. Apresentações Hoje: 5 (Baseado na lista da tela de Apresentações) */}

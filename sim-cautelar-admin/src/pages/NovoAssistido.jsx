@@ -174,18 +174,18 @@ const NovoAssistido = () => {
           return;
       }
 
-      // Caso 2: Novo Cadastro Finalizado (Pergunta sobre monitoramento)
+      // Caso 2: Novo Cadastro Finalizado (Pergunta sobre checagem)
       // Aqui simularíamos o POST para o backend salvando o usuário
       
       // Pergunta de fluxo
-      const desejaIniciar = window.confirm("Cadastro finalizado com sucesso!\n\nDeseja iniciar o monitoramento deste assistido de imediato?");
+      const desejaIniciar = window.confirm("Cadastro finalizado com sucesso!\n\nDeseja iniciar a checagem deste assistido de imediato?");
 
       if (desejaIniciar) {
           // Lógica de ativação imediata (simulada)
-          alert("Monitoramento Iniciado! O status do assistido agora é 'Regular'.");
+          alert("Checagem Iniciada! O status do assistido agora é 'Regular'.");
       } else {
           // Lógica de manter inativo/pendente
-          alert("Cadastro Salvo. O monitoramento poderá ser iniciado posteriormente através da lista de assistidos.");
+          alert("Cadastro Salvo. A checagem poderá ser iniciada posteriormente através da lista de assistidos.");
       }
 
       navigate('/assistidos');
@@ -218,7 +218,7 @@ const NovoAssistido = () => {
 
                 {partesEncontradas.length > 0 && !dadosCarregados && (
                     <div style={{ marginTop: '16px', borderTop: '1px solid #BAE6FD', paddingTop: '16px' }}>
-                        <h4 style={{ color: '#0369A1', marginBottom: '12px', fontSize: '14px' }}>Selecione a pessoa a ser monitorada:</h4>
+                        <h4 style={{ color: '#0369A1', marginBottom: '12px', fontSize: '14px' }}>Selecione a pessoa a ser cadastrada:</h4>
                         <div style={{ display: 'grid', gap: '12px' }}>
                             {partesEncontradas.map((parte, index) => (
                                 <div key={index} onClick={() => selecionarParte(parte)} 
@@ -329,7 +329,7 @@ const NovoAssistido = () => {
                 {!semPerimetro && (
                     <>
                         <div className="form-grid">
-                            <div className="input-group"><label>Ponto de Monitoramento</label><select className="form-control" value={pontoMonitoramento} onChange={(e) => { setPontoMonitoramento(e.target.value); if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); else setCoords([-7.1215, -34.8650]); }}><option value="residencia">Residência do Assistido</option><option value="forum">Fórum Criminal / Vara</option></select></div>
+                            <div className="input-group"><label>Ponto de Checagem</label><select className="form-control" value={pontoMonitoramento} onChange={(e) => { setPontoMonitoramento(e.target.value); if(e.target.value === 'forum') setCoords([-7.1150, -34.8630]); else setCoords([-7.1215, -34.8650]); }}><option value="residencia">Residência do Assistido</option><option value="forum">Fórum Criminal / Vara</option></select></div>
                             <div className="input-group"><label>Raio Permitido</label><select className="form-control" value={raioPerimetro} onChange={(e) => setRaioPerimetro(Number(e.target.value))}><option value={0}>Exatamente no local (0m)</option><option value={100}>100 metros</option><option value={500}>500 metros</option><option value={1000}>1 Km</option></select></div>
                             <div className="input-group"><label>Endereço de Referência</label><input type="text" className="form-control" value={pontoMonitoramento === 'residencia' ? `${formData.logradouro}, ${formData.numero}` : 'Fórum Criminal'} disabled /></div>
                         </div>
