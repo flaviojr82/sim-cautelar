@@ -49,7 +49,7 @@ const Assistidos = () => {
   const [imgSrc, setImgSrc] = useState(null);
   
   // Estados para o Fluxo de Análise/Punição
-  const [stepAnalise, setStepAnalise] = useState(1); // 1 = Fatos, 2 = Penalidade
+  const [stepAnalise, setStepAnalise] = useState(1); // 1 = Fatos, 2 = Penalidade (Agora Step 2 não será acessado via botão PJe)
   const [acaoPenalidade, setAcaoPenalidade] = useState('advertencia'); // advertencia, diligencia, juizo
 
   const webcamRef = useRef(null);
@@ -70,7 +70,7 @@ const Assistidos = () => {
     
     // Reset de todos os estados
     setMotivoSusp('');
-    setJustificativaSusp(''); // Resetando a justificativa
+    setJustificativaSusp(''); 
     setObsModal('');
     setMetodoValidacao('visual');
     setCameraAtiva(false);
@@ -105,16 +105,21 @@ const Assistidos = () => {
         // Mensagem solicitada
         msg = `Sucesso: A checagem foi suspensa corretamente.`;
         
-        // Log para depuração (opcional, mostra que os dados foram capturados)
+        // Log para depuração
         console.log("Suspensão:", { motivo: motivoSusp, justificativa: justificativaSusp });
     }
     else if (modalType === 'reativar') msg = `Checagem REATIVADA!`;
     
-    // Lógica do Modal de Análise
+    // Lógica do Modal de Análise (Resolver Pendência)
     else if (modalType === 'analisar') {
         if (decision === 'validar') {
             msg = `Justificativa aceita. Status alterado para REGULAR.`;
+        } else if (decision === 'comunicar_pje') {
+            // -- ALTERAÇÃO: Mensagem de sucesso direta e encerramento do fluxo --
+            msg = "Sucesso: A infração foi enviada ao PJe.";
         } else if (decision === 'aplicar_penalidade') {
+            // Este bloco tecnicamente não será mais alcançado pelo fluxo do botão "Comunicar ao PJe",
+            // mas mantido para integridade caso haja outra via.
             const tipos = {
                 'advertencia': 'Advertência registrada no histórico.',
                 'diligencia': 'Solicitação de Diligência encaminhada à Central de Mandados.',
@@ -290,7 +295,6 @@ const Assistidos = () => {
                                             <button className="dropdown-item" onClick={() => openModal('presencial', item)}>
                                                 <UserCheck size={16} color="#0F99A8" /> 
                                                 Apresentação Presencial
-                                                {/* --- ALTERAÇÃO 1: Ícone indicador de foto --- */}
                                                 <Camera size={14} style={{ marginLeft: 'auto', color: '#94A3B8' }} />
                                             </button>
                                       )}
@@ -384,6 +388,7 @@ const Assistidos = () => {
                                 </div>
                             )}
 
+                            {/* --- OBS: Este bloco Step 2 continua no código para manter a estrutura, mas não é mais acessível pelo botão "Comunicar ao PJe" --- */}
                             {stepAnalise === 2 && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                                     <div style={{ padding: '12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '8px', color: '#991B1B', fontSize: '14px' }}><strong>Atenção:</strong> Você optou por confirmar a irregularidade. Selecione a medida administrativa.</div>
@@ -412,7 +417,6 @@ const Assistidos = () => {
                             {modalType === 'presencial' && (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                     
-                                    {/* --- ALTERAÇÃO 2: Visualização da Foto de Cadastro --- */}
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
                                         <div style={{ width: '120px', height: '120px', borderRadius: '50%', overflow: 'hidden', border: '4px solid #F1F5F9', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
                                             {selectedUser?.foto ? (
@@ -435,7 +439,6 @@ const Assistidos = () => {
                                 </div>
                             )}
 
-                            {/* --- ALTERAÇÃO SOLICITADA: MODAL DE SUSPENSÃO ATUALIZADO --- */}
                             {modalType === 'suspender' && (
                                 <>
                                     <div className="input-group">
@@ -474,7 +477,8 @@ const Assistidos = () => {
                     {modalType === 'analisar' && stepAnalise === 1 ? (
                         <>
                             <button className="btn-primary" style={{ background: '#10B981' }} onClick={() => handleConfirmAction('validar')}>Aceitar</button>
-                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => setStepAnalise(2)}>Comunicar ao PJe</button>
+                            {/* --- ALTERAÇÃO: Chama handleConfirmAction com 'comunicar_pje' em vez de avançar para step 2 --- */}
+                            <button className="btn-primary" style={{ background: '#EF4444' }} onClick={() => handleConfirmAction('comunicar_pje')}>Comunicar ao PJe</button>
                         </>
                     ) : (
                         <button className="btn-primary" onClick={() => handleConfirmAction()} disabled={modalType === 'suspender' && !motivoSusp}>
