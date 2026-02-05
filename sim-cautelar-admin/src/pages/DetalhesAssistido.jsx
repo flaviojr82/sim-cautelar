@@ -58,7 +58,7 @@ const DetalhesAssistido = () => {
       { id: 1, data: '15/01/2026 10:00', tipo: 'presencial', titulo: 'Apresentação Presencial', desc: 'Compareceu ao fórum. Atendido por Oficial João.', icon: CheckCircle, color: '#10B981' },
       { id: 2, data: '14/01/2026 08:30', tipo: 'app', titulo: 'Apresentação via App', desc: 'Reconhecimento Facial Válido (98%). Local: Residência.', icon: Activity, color: '#0F99A8' },
       { id: 3, data: '10/01/2026 19:45', tipo: 'alerta', titulo: 'Alerta de Horário', desc: 'Tentativa de check-in fora do horário permitido.', icon: AlertTriangle, color: '#F59E0B' },
-      { id: 4, data: '01/01/2026 09:00', tipo: 'inicio', titulo: 'Início do Monitoramento', desc: 'Cadastro ativado pelo sistema.', icon: PlayCircle, color: '#3B82F6' },
+      { id: 4, data: '01/01/2026 09:00', tipo: 'inicio', titulo: 'Início da Checagem', desc: 'Cadastro ativado pelo sistema.', icon: PlayCircle, color: '#3B82F6' },
       { id: 5, data: '01/01/2026 08:30', tipo: 'cadastro', titulo: 'Cadastro Realizado', desc: 'Usuário Admin criou o registro.', icon: User, color: '#64748B' },
       ];
 
@@ -93,7 +93,7 @@ const DetalhesAssistido = () => {
                     fontWeight: '600', background: 'none', border: 'none', cursor: 'pointer' 
                 }}
             >
-                Dados e Monitoramento
+                Dados e Checagem
             </button>
             <button 
                 onClick={() => setActiveTab('historico')}
@@ -150,11 +150,11 @@ const DetalhesAssistido = () => {
 
                 {/* 3. Mapa */}
                 <div className="form-section-title">
-                    <MapPin size={20} color="#0F99A8" /> Perímetro Monitorado
+                    <MapPin size={20} color="#0F99A8" /> Perímetro Checado
                 </div>
                 <div className="form-grid" style={{ marginBottom: '16px' }}>
                      <div className="input-group">
-                        <label>Ponto de Monitoramento</label>
+                        <label>Ponto de Checagem</label>
                         <div className="form-control" style={{ background: '#F8FAFC', border: 'none', color: '#1E2939', fontWeight: '500' }}>
                             {assistido.pontoMonitoramento}
                         </div>
